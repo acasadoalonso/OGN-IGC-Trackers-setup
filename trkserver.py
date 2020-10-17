@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 #########################################################################
 # This program receives the tracker status message from the OGN station and stores them on the MySQL DB
+# OGN/IGC tracker project
 #########################################################################
 import socket
 import string
