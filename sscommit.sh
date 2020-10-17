@@ -5,4 +5,4 @@ rm trkstatus*
 cp /var/www/html/node/trkstatus*     .
 git add .
 git commit
-git push origin master
+git push origin main
