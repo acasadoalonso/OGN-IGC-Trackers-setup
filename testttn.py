@@ -1,3 +1,7 @@
+#!/usr/bin/python3
+# ---------------------------------------------------------------------------- #
+# This program test the TTN API and monitor the activity of the OGN application
+# ---------------------------------------------------------------------------- #
 import time
 import ttn
 import ogndecode
