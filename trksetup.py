@@ -164,10 +164,11 @@ else:
 keyfilename=keyfile		# name of the file containing the encryption keys
 keyfilename='keyfile'		# name of the file containing the encryption keys
 etx=b'\x03'			# the Control C
-DecKey=[]			# the 4 hex values of the key
-key=getkeyfile(keyfilename)	# get the key from the keyfile
-DecKey=getkeys(DecKey, key)	# get the keys 4 words
-#print (DecKey)
+if not noencr:
+   DecKey=[]			# the 4 hex values of the key
+   key=getkeyfile(keyfilename)	# get the key from the keyfile
+   DecKey=getkeys(DecKey, key)	# get the keys 4 words
+   #print (DecKey)
 # --------------------------------------#
 DBpath      = config.DBpath
 DBhost      = config.DBhost
