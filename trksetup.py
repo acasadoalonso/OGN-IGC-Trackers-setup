@@ -12,7 +12,6 @@ import datetime
 import signal
 import os
 import binascii
-from Keys import *
 
 def signal_term_handler(signal, frame):
     mqtt_client.close()
