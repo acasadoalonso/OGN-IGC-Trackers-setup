@@ -40,6 +40,8 @@ def printparams(ser, trkcfg, prt=False):	# print the parameters
         if len(line) == 0:      # end of data ???
            break		# all done
         l=line.decode('utf-8').rstrip()
+        if line	[0:3] == 'I (':
+           continue
         if cnt == 0:		# first line is the ID
            ID=line[0:10]
            MAC=line[11:23]
