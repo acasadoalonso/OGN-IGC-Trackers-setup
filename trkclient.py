@@ -33,6 +33,7 @@ server   = args.server			# print on|off
 port     = args.port			# print on|off
 
 #server="CASADOUBUNTU.local"				# server to send the TRK status messages
+print ("\nWaiting for connecting with:", server)
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# create the sock
 errorc = 0
 while errorc < 100:					# while not too many errors
@@ -41,8 +42,8 @@ while errorc < 100:					# while not too many errors
 		break
 	except:
 		if errorc > 100:
+			print ("Error connecting ... with server:", server, ":",port)
 			exit(0)
-			print ("Error connecting ...")
 		sleep(5)
 		errorc += 1
 

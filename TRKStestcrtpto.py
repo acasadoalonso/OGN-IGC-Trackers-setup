@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 #########################################################################
-# This program receives the tracker status message from the OGN station and stores them on the MySQL DB
+# This program receives messages from the OGN/IGC tracker
 # OGN/IGC tracker project
 #########################################################################
 import socket
@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 
 def signal_term_handler(signal, frame):
     print('got SIGTERM ... shutdown orderly')
-    shutdown(cond) 			# shutdown orderly
+    shutdown() 			# shutdown orderly
     sys.exit(0)
 
 
@@ -38,46 +38,30 @@ def prttime(unixtime):
 
 #
 ########################################################################
-def shutdown(cond, prt=False):          # shutdown routine, close files and report on activity
+def shutdown(prt=False):          # shutdown routine, close files and report on activity
                                         # shutdown before exit
-	cond.commit()
-	cond.close()
 	date = datetime.utcnow()        # get the date
 	print ("Shutdown now:", date)
 	return
 ########################################################################
-def storedb(curs, data, prt=False):	# store the data on the MySQL DB
-	if data[0:2] != 'M:':		# if is is not an status msg, nothing to do
-		return False
-	otime = datetime.utcnow()	# grab the time
-	sc1=data[2:].find(':')		# parser the message
-	sc2=data[sc1+3:].find(':')
-	station=data[2:sc1+2]
-	ident="OGN"+data[sc1+3:sc1+sc2+3]
-	status=otime.strftime("%H%M%S")+'h '+data[sc1+sc2+4:].rstrip('\n\r ')
-	if len(status) > 254:
-		status=staus[0:254]
-	if prt:
-		print ("S-->", ident, station, otime, status, "<--")
-					# prepare the SQL command
-	inscmd = "insert into OGNTRKSTATUS values ('%s', '%s', '%s', '%s', '%s')" % (ident, station, otime, status, 'STAT')
-	try:
-		curs.execute(inscmd)	# store the data on the MySQL DB
-	except MySQLdb.Error as e:
-		try:
-			print(">>>MySQL1 Error [%d]: %s" % ( e.args[0], e.args[1]))
-		except IndexError:
-			print(">>>MySQL2 Error: %s" % str(e))
-			print(">>>MySQL3 error:",  numtrksta, inscmd)
-			print(">>>MySQL4 data :",  s)
-	return True
 #
+# --------------------------------------#
+def process(msg, prt):
+    hn=dd[8:18]+".local"
+    try:
+       ipAddress   = socket.gethostbyname(hn)
+       print(msg, "{} is: {}".format(hn, ipAddress))
+    except:
+       print(msg, "HN not found", hn)
+    return
+# --------------------------------------#
+# --------------------------------------#
 ########################################################################
 #
 
-programver = 'V1.1'
-pidfile="/tmp/TRKS.pid"
-print("\n\nStart TRKSTATUS  "+programver)
+programver = 'V1.0'
+pidfile="/tmp/TRKScrypto.pid"
+print("\n\nStart TRKStest  "+programver)
 print("=====================")
 
 print("Program Version:", time.ctime(os.path.getmtime(__file__)))
@@ -105,20 +89,8 @@ if os.path.exists(pidfile):		# check if another process running
 import locale
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 # --------------------------------------#
-DBpath      = config.DBpath
-DBhost      = config.DBhost
-DBuser      = config.DBuser
-DBpasswd    = config.DBpasswd
-DBname      = config.DBname
 # we force everything FALSE as we try to push to the APRS
 OGNT        = False
-# --------------------------------------#
-cond = MySQLdb.connect(host=DBhost, user=DBuser, passwd=DBpasswd, db=DBname)
-curs = cond.cursor()               	# set the cursor
-
-print("Time now is: ", date, " Local time")
-print("MySQL: Database:", DBname, " at Host:", DBhost)
-# --------------------------------------#
 
 count = 0				# counter of received messages
 HOST=""					# localhost
@@ -142,19 +114,18 @@ try:					# server process receive the TRKSTATUS messages and store it on the DDB
     print ("Socket binded:", HOST, PORT) 
     s.listen(1)
     print ("Socket listening:") 
-    socket=s
+    #socket=s
     conn, addr = s.accept()
     print ("Socket accepted:", addr) 
     sock=conn
     print ("Waiting for connections:", HOST, PORT)
     with conn:
         print('Connected by', addr)
-        print("Wait now for login from the OGN station and credentials.\n")
         while True:			# for ever while connected
             now = datetime.utcnow()		# get the UTC time
             if now.day != day:	        # check if day has changed
                 print("End of Day...Day: ", day,"\n\n")	# end of UTC day
-                shutdown(cond)		# recycle
+                shutdown()		# recycle
                 print("Bye ... :", count,"\n\n\n")	# end of UTC day
                 exit(0)
 
@@ -163,22 +134,20 @@ try:					# server process receive the TRKSTATUS messages and store it on the DDB
             count += 1
             dd=data.decode('utf-8')	# convert it to an stream
             if prt:
-               mm=dd.rstrip(" \n\r")
-               print("D:",  mm , ":<<<")
+               print("D:", dd)
 					# build the reply msg
-            msg="OK "+str(count)+" "+hostname+' '+programver
+            date = datetime.utcnow()                # get the date
+            dtetme = date.strftime("%y/%m/%d %H:%M:%S")           # today's date
+            msg="OK "+str(count)+" "+dtetme+" "+hostname+" "+programver
             conn.sendall(msg.encode('utf-8')) # send it back to the client
-            storedb(curs, dd, prt)	# store on the DDBB
-            cond.commit()		# and commit it
-            if count % 10:
-               sys.stdout.flush()
+            process(dd,  prt)		# Process the msg
         print ("Counter:", count)
 #########################################################################################
 except KeyboardInterrupt:
     print("Keyboard input received, end of program, shutdown")
     pass
 
-shutdown(cond)				# shutdown tasks
+shutdown()				# shutdown tasks
 print ("Exit now ...          ", count)
 exit(0)
 

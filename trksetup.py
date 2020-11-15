@@ -133,7 +133,7 @@ parser.add_argument('-k', '--printkeys',   required=False, dest='keys',     acti
 parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile')
 parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True)
 parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=True)
-parser.add_argument('-n', '--noencrypt',   required=False, dest='noencr',   action='store', default=True)
+parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False)
 
 args  	= parser.parse_args()
 prt   	= args.prt
@@ -143,7 +143,7 @@ usb   	= args.usb
 keyfile	= args.keyfile			
 ognddb	= args.ognddb
 ttnopt	= args.ttn
-noencr	= args.noencr
+encr	= args.encr
 
 if ognddb == "False":
    ognddb = False
@@ -155,20 +155,21 @@ if ttnopt == "False":
 else:
    ttnopt = True			
 
-if noencr == "False":
-   noencr = False
+if encr == "True":
+   encr = True
 else:
-   noencr = True			
+   encr = False			
 
 # --------------------------------------#
 keyfilename=keyfile		# name of the file containing the encryption keys
 keyfilename='keyfile'		# name of the file containing the encryption keys
 etx=b'\x03'			# the Control C
-if not noencr:
+if encr:
+   from Keys import *
    DecKey=[]			# the 4 hex values of the key
    key=getkeyfile(keyfilename)	# get the key from the keyfile
    DecKey=getkeys(DecKey, key)	# get the keys 4 words
-   #print (DecKey)
+   print ("Keys:",DecKey)
 # --------------------------------------#
 DBpath      = config.DBpath
 DBhost      = config.DBhost
@@ -188,7 +189,7 @@ else:
 
 # --------------------------------------#
 i=0
-if not noencr:
+if encr:
     from Keys import *		# get the key handling functions
     import ogndecode
     encryptcmd=b'$POGNS,EncryptKey='# prepare the encryption keys
@@ -235,11 +236,12 @@ MAC=param['MAC']		# get the tracker MAC ID
 if not prt:
    print (param)		# if not prints it yet 
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
-if keys and not noencr:
+if keys and encr:
 	print (encryptcmd) 	# print the encrypt command
-if setup and not noencr:
+if setup and encr:
 	ser.write(encryptcmd)	# Write the encryption keys
 	ser.write("$POGNS,Encrypt=1".encode('utf-8')) 
+	print("$POGNS,Encrypt=1".encode('utf-8')) 
 sleep(1)			# wait a second to give a chance to receive the data
 found=False			# assume not found YET
 if ognddb:			# if using the OGN DDB
@@ -251,7 +253,10 @@ if ognddb:			# if using the OGN DDB
         if prt:
            print (info)
         ogntid 	= info['device_id']	# OGN tracker ID
-        flarmid = info['device_aprsid']	# Flarmid id to be linkeda
+        if 'device_aprsid' in info:
+            flarmid = info['device_aprsid']	# Flarmid id to be linked
+        else:
+            flarmid = ogntid
         devtype = info['device_type']	# device type (glider, powerplane, paraglider, etc, ...)
         regist 	= info['registration'] 	# registration id to be linked
         pilot 	= 'OGN/IGC_Tracker'  	# owner
