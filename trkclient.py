@@ -6,7 +6,9 @@ from telnetlib import *
 from time import sleep
 import argparse
 #########################################################################
-# This script ins installed on the OGN station in order to send the status of the OGN trackers to the management server
+# This script is installed on the OGN station in order to send the status 
+# of the OGN trackers to the management server
+# The trkserver.py receive the messages sent by this program on --port
 #########################################################################
 
 def signal_term_handler(signal, frame):
@@ -28,15 +30,15 @@ parser.add_argument('-s',  '--server',     required=False,
 parser.add_argument('-pt',  '--port',     required=False,
                     dest='port',   action='store', default=50000)
 args = parser.parse_args()
-prt      = args.prt			# print on|off
-server   = args.server			# print on|off
-port     = args.port			# print on|off
+prt      = args.prt					# print on|off
+server   = args.server					# server name or IP addr
+port     = args.port					# port number, by default 50000
 
-#server="CASADOUBUNTU.local"				# server to send the TRK status messages
+#server="CasadoUbuntu.local"				# server to send the TRK status messages
 print ("\nWaiting for connecting with:", server)
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)# create the sock
 errorc = 0
-while errorc < 100:					# while not too many errors
+while errorc < 1000:					# while not too many errors
 	try:
 		sock.connect((server, port))		# try to connect
 		break
@@ -44,14 +46,14 @@ while errorc < 100:					# while not too many errors
 		if errorc > 100:
 			print ("Error connecting ... with server:", server, ":",port)
 			exit(0)
-		sleep(5)
-		errorc += 1
+		sleep(5)				# wait a little bit to trkserver to be up
+		errorc += 1				# lets try again
 
 print("Socket connected to: ", server, ":", port)	# report that is connected
 hostname = socket.gethostname()				# get the name of the OGN station
 							# logon to OGN APRS network
 
-login = 'L: user '+hostname+' vers '+pgmvers		# prepare the login message
+login = 'L: user '+hostname+' vers '+pgmvers+' ;'	# prepare the login message
 if prt:
 	print(login)
 login=login.encode(encoding='utf-8', errors='strict')	# convert it to bytes
@@ -67,11 +69,11 @@ while True:						# for ever
 		r=tn.read_until(b'\n').decode('UTF-8')	# read char by char untile new line
 	except KeyboardInterrupt:			# in case of Crtl-C close
 		print("Keyboard input received, end of program, shutdown")
-		print("Msgs sent:", count)
+		print("Msgs sent:", count,"\n")
 		sock.close()
 		exit(0)
 	except:						# any other error
-		print("Msgs sent:", count)
+		print("Telnet error ... Msgs sent:", count)
 		sock.close()
 		exit(0)
 	sdr=r.find(">OGNSDR")				# find the TCP/IP indicator
@@ -88,11 +90,11 @@ while True:						# for ever
 	rr= r[khz+13:]					# the rest
 	sc=rr.find(':')
 	body=rr[sc+2:]
-	msg="M:"+station+':'+ident+':'+body		# prepare the message to be sent
+	msg="M:"+station+':'+ident+':'+body+' ;'	# prepare the message to be sent
 	msg=msg.encode('utf-8')				# convert to bytes
 	if station != ':' :				# if the station is already identified ??
 		try:
-			print ("<--", msg)
+			print ("<--", msg)		# print the message to send to trkserver
 			sock.sendall(msg)		# send it to the management server
 		except KeyboardInterrupt:		# if Ctrl-C 
 			print("Keyboard input received, end of program, shutdown")
@@ -100,11 +102,12 @@ while True:						# for ever
 			sock.close()
 			exit(0)
 		except:
-			print("Msgs sent:", count)
+			print("TCP send error ... Msgs sent:", count)
 			sock.close()
 			exit(0)
 		count +=1				# increase counter of messages sent
 		data = sock.recv(1024)			# receive the ack
 		#print('--> Received', repr(data), count)
 		print('--> Received', data.decode('UTF-8'), count) # and report it
+# loop forever
 #########################################################################################################################
