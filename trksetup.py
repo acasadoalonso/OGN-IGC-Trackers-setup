@@ -12,6 +12,7 @@ import datetime
 import signal
 import os
 import binascii
+import base64
 
 def signal_term_handler(signal, frame):
     mqtt_client.close()
@@ -43,11 +44,12 @@ def printparams(ser, trkcfg, prt=False):	# print the parameters
            continue
         if cnt == 0:		# first line is the ID
            ID=line[0:10]
-           MAC=line[11:23]
            if ID[0:4] != b'1:3:':
               print("ID>>>:", ID)
               ser.write(etx)	# send a Ctrl-C 
               continue
+           if line[10:11] == b'/':
+              MAC=line[11:23]
         if l[0:7] == '/spiffs':	# ignore the spiffs lines
            continue
         if prt:
@@ -86,6 +88,7 @@ trkcfg=[ "Address", 		# config parameters to scan
          "EncryptKey[1]",
          "EncryptKey[2]",
          "EncryptKey[3]",
+         "PublicKey",
          "Verbose",
          "BTname",
          "Pilot",
@@ -104,6 +107,28 @@ trkcfg=[ "Address", 		# config parameters to scan
          "PilotID"]
 
 #######
+REG_URL = "http://acasado.es:60080/registration/V1/?action=REGISTER&token="      # the OGN registration source
+#REG_URL = "http://localhost:8181/?action=REGISTER&token="                       # the OGN registration source
+
+def setregdata(mac, reg, devid, uniqueid, publickey, prt=True):         # set the data from the API server
+    date = datetime.datetime.utcnow()       # get the date
+    dte = date.strftime("%Y-%m-%d")         # today's date
+    nonce = base64.b64encode(dte.encode('utf-8')).decode('ascii')
+    url=REG_URL+nonce
+    if reg == '':
+       url=url+'&registration=NONE'
+    else:
+       url=url+'&registration='+reg
+    url=url+'&mac='+mac+'&devid='+devid+'&uniqueid='+uniqueid+'&publickey='+publickey
+    if prt:
+       print(url)
+    req = urllib.request.Request(url)
+    req.add_header("Accept", "application/json")  # it return a JSON string
+    req.add_header("Content-Type", "application/hal+json")
+    r = urllib.request.urlopen(req)         # open the url resource
+    js=r.read().decode('UTF-8')
+    j_obj = json.loads(js)                  # convert to JSON
+    return j_obj 
 # .....................................................................#
 signal.signal(signal.SIGTERM, signal_term_handler)
 # .....................................................................#
@@ -114,26 +139,25 @@ dev_id     = ""
 appEui     = "70B3D57ED0035895"
 appKey     = "ttn-account-v2.V4Z-WSzqhfR0FKiKFYu4VLgNEbxP9QluACwD1pSfwmE"
 
-
-
 #######
 # --------------------------------------#
 #
 # OGN tracker SETUP manager 
 #
 # --------------------------------------#
-print ("\n\nOGN tracker setup program:\nIt gets the information from the tracker firmware and hendles the setup parameter.\nThe tracker mus be connected to the USB port.")
-print ("==================================================================================\n\n")
-import config			# get the configuration parameters
-parser = argparse.ArgumentParser(description="OGN manage the OGN TRACKERS setup parameters")
+print ("\n\nOGN tracker setup program:\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
+print ("Args: -p print ON|OFF, -u USB port, -s setup on|off, -k print the keys on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB")
+print ("============================================================================================================================================\n\n")
+parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
 parser.add_argument('-p', '--print',       required=False, dest='prt',      action='store', default=False)
 parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0)
 parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False)
 parser.add_argument('-k', '--printkeys',   required=False, dest='keys',     action='store', default=False)
 parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile')
 parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True)
-parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=True)
+parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False)
 parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False)
+parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False)
 
 args  	= parser.parse_args()
 prt   	= args.prt
@@ -143,6 +167,7 @@ usb   	= args.usb
 keyfile	= args.keyfile			
 ognddb	= args.ognddb
 ttnopt	= args.ttn
+regopt	= args.reg
 encr	= args.encr
 
 if ognddb == "False":
@@ -150,10 +175,16 @@ if ognddb == "False":
 else:
    ognddb = True			
 
-if ttnopt == "False":
-   ttnopt = False
+if ttnopt == "True":
+   ttnopt = True
 else:
-   ttnopt = True			
+   ttnopt = False			
+
+if regopt == "True":
+   regopt = True
+   ognddb = True		# register froce to use the OGN DDB			
+else:
+   regopt = False			
 
 if encr == "True":
    encr = True
@@ -171,17 +202,17 @@ if encr:
    DecKey=getkeys(DecKey, key)	# get the keys 4 words
    print ("Keys:",DecKey)
 # --------------------------------------#
-DBpath      = config.DBpath
-DBhost      = config.DBhost
-DBuser      = config.DBuser
-DBpasswd    = config.DBpasswd
-DBname      = config.DBname
 
-if not ognddb:
+if not ognddb:			# deprecated code, it will be susbtituted by OGNDDB
+   import config		# get the configuration parameters
    import MySQLdb               # the SQL data base routines
 				# open the DataBase
+   DBpath      = config.DBpath
+   DBhost      = config.DBhost
+   DBuser      = config.DBuser
+   DBpasswd    = config.DBpasswd
+   DBname      = config.DBname
    conn = MySQLdb.connect(host=DBhost, user=DBuser, passwd=DBpasswd, db=DBname)
-
    print("MySQL: Database:", DBname, " at Host:", DBhost)
 else:
    from ognddbfuncs import *
@@ -189,7 +220,7 @@ else:
 
 # --------------------------------------#
 i=0
-if encr:
+if encr:			# if use encryption
     from Keys import *		# get the key handling functions
     import ogndecode
     encryptcmd=b'$POGNS,EncryptKey='# prepare the encryption keys
@@ -233,6 +264,8 @@ if param == False:		# if noot found, nothing else to do
    exit(1)
 ID=param['TrackerID']		# get the tracker ID
 MAC=param['MAC']		# get the tracker MAC ID
+#publickey=param['PublicKey']	# get the Public Key from the tracker ==> reg DB
+publickey="1234567890ABCDEF1234567890ABCDEF"
 if not prt:
    print (param)		# if not prints it yet 
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
@@ -244,10 +277,12 @@ if setup and encr:
 	print("$POGNS,Encrypt=1".encode('utf-8')) 
 sleep(1)			# wait a second to give a chance to receive the data
 found=False			# assume not found YET
+
 if ognddb:			# if using the OGN DDB
    devid=ID
    info=getogninfo(devid)	# get the info from the OGN DDB
-   if info == "NOInfo":
+   if 'return' in info:
+        print("Device "+devid+" not registered on the OGN DDB\n", info)
         pass			# nothing to do
    else:
         if prt:
@@ -262,13 +297,14 @@ if ognddb:			# if using the OGN DDB
         pilot 	= 'OGN/IGC_Tracker'  	# owner
         compid 	= info['cn']  		# competition ID
         model  	= info['aircraft_model']  	# model
-        print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model) 
+        uniqueid= info['uniqueid']	# unique id
+        print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model, uniqueid) 
         found=True
-else:
+else:				# deprecated code
    curs = conn.cursor()         # set the cursor for searching the devices
                                 # get all the devices with OGN tracker
    curs.execute("select id, flarmid, registration, owner, compid, model from TRKDEVICES where devicetype = 'OGNT' and active = 1 and id = '"+ID+"'; ")
-   for rowg in curs.fetchall(): 	# look for that registration on the OGN database
+   for rowg in curs.fetchall():	# look for that registration on the OGN database
 
         ogntid 	= rowg[0]	# OGN tracker ID
         flarmid = rowg[1]	# Flarmid id to be linked
@@ -284,13 +320,15 @@ else:
            print("WARNING: Multiple IDs for the same tracker !!!! --> ", ID, ogntid)
         found=True
    if not found:
-        print ("Device not found on the DataBase\n\n")
-print( "==============================================================================================")
+        print ("Device "+ID+" not found on the REG DataBase\n\n")
+
+print( "==============================================================================================\n\n")
+
 if found:			# set the last one !!!
    APP_key=''
-   if ttnopt:
+   if ttnopt:			# if TTN registration
 
-      devicetest = {      # the device dict
+      devicetest = {      	# the device dict
         "description"     : "OGN/IGC-"+regist+" ",
         "appEui"          : appEui,
         "devEui"          : "0000"+MAC,
@@ -351,10 +389,16 @@ if found:			# set the last one !!!
         cmd="$POGNS,AppKey="+APP_key+"\n"
         ser.write(cmd.encode('UTF-8'))
         ser.write(etx)		# send a Ctrl-C 
-        sleep(1)			# wait a second to give a chance to receive the data
+        sleep(1)		# wait a second to give a chance to receive the data
         printparams(ser, trkcfg, False)# print the new parameters
+
+   if regopt:			# if registration on the registration DB
+        print("PPP", MAC, regist, ID, uniqueid, publickey)
+        r=setregdata(MAC, regist, ID, uniqueid, publickey)
+        print ("Registration at server: ", r)
+
 else:
-   print("No information about the device on the databases !!!\n\n")
+   print("No information about the device "+ID+" on the databases !!!\n\n")
 print( "==============================================================================================")
 ser.close()
 ###################################################################################################################################################################
