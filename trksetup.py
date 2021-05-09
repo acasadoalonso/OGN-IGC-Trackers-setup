@@ -281,12 +281,12 @@ found=False			# assume not found YET
 if ognddb:			# if using the OGN DDB
    devid=ID
    info=getogninfo(devid)	# get the info from the OGN DDB
-   if 'return' in info:
+   if 'return' in info or info == "NOInfo":
         print("Device "+devid+" not registered on the OGN DDB\n", info)
         pass			# nothing to do
    else:
         if prt:
-           print (info)
+           print ("INFO: :::", info)
         ogntid 	= info['device_id']	# OGN tracker ID
         if 'device_aprsid' in info:
             flarmid = info['device_aprsid']	# Flarmid id to be linked
