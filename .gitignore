@@ -4,3 +4,5 @@ oldtrksetup/
 __pycache__/
 ss*
 testTTN.py
+ECDSAtest/
+.vscode
