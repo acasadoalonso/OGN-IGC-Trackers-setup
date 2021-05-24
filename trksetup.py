@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 ######################################################################
-# This program reads thhe config params inside the tracker and set the new ones
+# This program reads the config params inside the tracker and set the new ones
 ######################################################################
 import argparse
 import serial
@@ -13,6 +13,8 @@ import signal
 import os
 import binascii
 import base64
+import requests
+
 
 def signal_term_handler(signal, frame):
     mqtt_client.close()
@@ -20,12 +22,20 @@ def signal_term_handler(signal, frame):
     os._exit(0)
 
 ########
-def getdevappkey(app_client, dev_id):
-    device      = app_client.device(dev_id)
+def getdevappkey(app_client, TTN_dev_id):		# get the TTN app key from device id
+    device      = app_client.device(TTN_dev_id)
     ld= device.lorawan_device
     APP_key  = binascii.b2a_hex(ld.app_key).decode('utf-8').upper()
     return (APP_key)
 
+########
+def getHEL_DEVID(HEL_dev_eui):				# return the Helium ID based on the lorawan EUI
+    r = requests.get(HEL_URL, headers=HEL_header)         	# get the list of devices
+    devices=r.json()					# read the data
+    for dev in devices:
+        if dev['dev_eui'] == HEL_dev_eui:		# it is our dev-eui ??
+           return (dev['id'])				# return tghe Helium ID
+    return 0
 
 ########
 def printparams(ser, trkcfg, prt=False):	# print the parameters 
@@ -129,15 +139,39 @@ def setregdata(mac, reg, devid, uniqueid, publickey, prt=True):         # set th
     js=r.read().decode('UTF-8')
     j_obj = json.loads(js)                  # convert to JSON
     return j_obj 
+
+
 # .....................................................................#
 signal.signal(signal.SIGTERM, signal_term_handler)
 # .....................................................................#
 
+# TheThingsNetwork (TTN) parameters
+#
+TTN_app_id     = "ogn"
+TTN_dev_id     = ""
+TTN_appEui     = "70B3D57ED0035895"
+TTN_appKey     = "ttn-account-v2.V4Z-WSzqhfR0FKiKFYu4VLgNEbxP9QluACwD1pSfwmE"
+#
 
-app_id     = "ogn"
-dev_id     = ""
-appEui     = "70B3D57ED0035895"
-appKey     = "ttn-account-v2.V4Z-WSzqhfR0FKiKFYu4VLgNEbxP9QluACwD1pSfwmE"
+# Helium Parameters
+#
+#Parameter Name	        Type	Description
+#name (required)	string	A human-friendly name for the device
+#app_eui (required)	string	LoRaWAN Application EUI
+#app_key (required)	string	LoRaWAN Application Key
+#dev_eui (required)	string	LoRaWAN Device EUI
+#
+HEL_name      = ""
+HEL_dev_eui   = ""
+
+HEL_DEVID     = ""
+HEL_app_eui   = "70B3D57ED0035895"
+HEL_app_key   = "862F5857054E149A1CC9BFBB569061F3"
+HEL_uuid_label= "219db7ef-9180-464b-bf3a-18764706aa70"
+label         = {"label":   HEL_uuid_label}
+HEL_header    = {"key": "929DkyxXnBXu+pf4sMDbld6I4xXP8vwbOLmTJD3oWO8"}
+HEL_URL       = "https://console.helium.com/api/v1/devices"
+LAB_URL       = "https://console.helium.com/api/v1/labels"
 
 #######
 # --------------------------------------#
@@ -145,6 +179,7 @@ appKey     = "ttn-account-v2.V4Z-WSzqhfR0FKiKFYu4VLgNEbxP9QluACwD1pSfwmE"
 # OGN tracker SETUP manager 
 #
 # --------------------------------------#
+#######
 print ("\n\nOGN tracker setup program:\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
 print ("Args: -p print ON|OFF, -u USB port, -s setup on|off, -k print the keys on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB")
 print ("============================================================================================================================================\n\n")
@@ -156,37 +191,44 @@ parser.add_argument('-k', '--printkeys',   required=False, dest='keys',     acti
 parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile')
 parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True)
 parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False)
+parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False)
 parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False)
 parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False)
 
 args  	= parser.parse_args()
-prt   	= args.prt
-setup 	= args.setup
-keys  	= args.keys
-usb   	= args.usb			
-keyfile	= args.keyfile			
-ognddb	= args.ognddb
-ttnopt	= args.ttn
-regopt	= args.reg
-encr	= args.encr
+prt   	= args.prt		# print debugging
+setup 	= args.setup		# setup the tracker
+keys  	= args.keys		# print encryption keys
+usb   	= args.usb		# USB port where the tracker is connected	
+keyfile	= args.keyfile		# file containing the encryption keys	
+ognddb	= args.ognddb		# use the OGN DDB for registration data
+ttnopt	= args.ttn		# Register on the TheThingsNetwork (TTN)
+helopt	= args.helium		# Register on the Helium Network
+regopt	= args.reg		# register the device
+encr	= args.encr		# Set encryption mode
 
-if ognddb == "False":
+if ognddb == "False":		# use the OGN DDB to get the data
    ognddb = False
 else:
    ognddb = True			
 
-if ttnopt == "True":
+if ttnopt == "True":		# register at the TTN network
    ttnopt = True
 else:
    ttnopt = False			
 
-if regopt == "True":
+if helopt == "True":		# register at the helium network
+   helopt = True
+else:
+   helopt = False			
+
+if regopt == "True":		# register the device
    regopt = True
    ognddb = True		# register froce to use the OGN DDB			
 else:
    regopt = False			
 
-if encr == "True":
+if encr == "True":		# set encryption mode
    encr = True
 else:
    encr = False			
@@ -219,8 +261,12 @@ else:
    print("Using OGN DDB database \n")
 
 # --------------------------------------#
+if usb == '-1':
+        exit(0)
+				# set the parameters 
 i=0
 if encr:			# if use encryption
+				# just prepare the encryption comd
     from Keys import *		# get the key handling functions
     import ogndecode
     encryptcmd=b'$POGNS,EncryptKey='# prepare the encryption keys
@@ -235,9 +281,7 @@ if encr:			# if use encryption
         if keys:
     	    print ("Key"+str(i)+":",h)
         i += 1
-if usb == '-1':
-        exit(0)
-				# set the parameters 
+# -------------------------------------#
 ser 			= serial.Serial()
 ser.port 		= '/dev/ttyUSB'+str(usb)
 ser.baudrate 		= 115200
@@ -253,6 +297,8 @@ ser.write(b'$POGNS,Verbose=0\n')# make no verbose to avoid other messages
 ser.write(b'$POGNS,Verbose=0\n')# do it again
 ser.write(etx)			# send a Ctrl-C 
 sleep(1)			# wait a second to give a chance to receive the data
+#--------------------------------------#
+
 try:
    param=printparams(ser, trkcfg, prt)# get the configuration parameters
 except:
@@ -262,10 +308,12 @@ except:
    param=printparams(ser, trkcfg, prt)# get the configuration parameters
 if param == False:		# if noot found, nothing else to do
    exit(1)
+#--------------------------------------#
+
 ID=param['TrackerID']		# get the tracker ID
 MAC=param['MAC']		# get the tracker MAC ID
 #publickey=param['PublicKey']	# get the Public Key from the tracker ==> reg DB
-publickey="1234567890ABCDEF1234567890ABCDEF"
+publickey="1234567890ABCDEF1234567890ABCDEF"    # <<<<<<< TEST
 if not prt:
    print (param)		# if not prints it yet 
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
@@ -276,6 +324,8 @@ if setup and encr:
 	ser.write("$POGNS,Encrypt=1".encode('utf-8')) 
 	print("$POGNS,Encrypt=1".encode('utf-8')) 
 sleep(1)			# wait a second to give a chance to receive the data
+#--------------------------------------#
+
 found=False			# assume not found YET
 
 if ognddb:			# if using the OGN DDB
@@ -301,6 +351,7 @@ if ognddb:			# if using the OGN DDB
         print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model, uniqueid) 
         found=True
 else:				# deprecated code
+
    curs = conn.cursor()         # set the cursor for searching the devices
                                 # get all the devices with OGN tracker
    curs.execute("select id, flarmid, registration, owner, compid, model from TRKDEVICES where devicetype = 'OGNT' and active = 1 and id = '"+ID+"'; ")
@@ -327,10 +378,11 @@ print( "========================================================================
 if found:			# set the last one !!!
    APP_key=''
    if ttnopt:			# if TTN registration
+      print ("TheThingsNetwork (TTN) network activity...")
 
       devicetest = {      	# the device dict
         "description"     : "OGN/IGC-"+regist+" ",
-        "appEui"          : appEui,
+        "appEui"          : TTN_appEui,
         "devEui"          : "0000"+MAC,
         "appKey"          : binascii.b2a_hex(os.urandom(16)).upper(), 
         "fCntUp"          : 10,
@@ -343,20 +395,20 @@ if found:			# set the last one !!!
         "attributes"      : { "info": compid},
       }
       # ------------------------------------------------------------------ #
-      dev_id      = flarmid.lower()
-      handler     = ttn.HandlerClient    (app_id, appKey)
-      app_client  = ttn.ApplicationClient(app_id, appKey, handler_address="", cert_content="/home/angel/.ssh/id_ras.pub", discovery_address="discovery.thethings.network:1900")
+      TTN_dev_id      = flarmid.lower()
+      handler     = ttn.HandlerClient    (TTN_app_id, TTN_appKey)
+      app_client  = ttn.ApplicationClient(TTN_app_id, TTN_appKey, handler_address="", cert_content="/home/angel/.ssh/id_ras.pub", discovery_address="discovery.thethings.network:1900")
       if setup:
          try:
-            app_client.delete_device  (dev_id)
+            app_client.delete_device  (TTN_dev_id)
          except:
-            print ("Deleting Device:", dev_id, "with MAC:", MAC, "Not registered on the TTN\n")
+            print ("Deleting Device:", TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN\n")
          try:   
-            app_client.register_device(dev_id, devicetest)
+            app_client.register_device(TTN_dev_id, devicetest)
          except Exception as e:
-            print ("Registering  Device error:", dev_id, "with MAC:", MAC,"Error:", e, "\n")
+            print ("Registering  Device error:", TTN_dev_id, "with MAC:", MAC,"Error:", e, "\n")
       try:
-         device      = app_client.device(dev_id)
+         device      = app_client.device(TTN_dev_id)
          ld          = device.lorawan_device
          APP_eui     = binascii.b2a_hex(ld.app_eui).decode('utf-8').upper()
          DEV_eui     = binascii.b2a_hex(ld.dev_eui).decode('utf-8').upper()
@@ -364,10 +416,47 @@ if found:			# set the last one !!!
          APP_key     = binascii.b2a_hex(ld.app_key).decode('utf-8').upper()
          lastseen    = int(ld.last_seen/1000000000)
          tme         = datetime.datetime.utcfromtimestamp(lastseen)
-         print ("Device:   ", ld.dev_id, "On application:", ld.app_id, " with APPeui:", APP_eui, "DEVeui:", DEV_eui, "DEVaddr:", DEV_addr, "APPkey:", APP_key, "Last Seen:", tme.strftime("%y-%m-%d %H:%M:%S"), "\n\n")    
-         print ("DevAppKey:", getdevappkey(app_client, dev_id), "\n\n")
+         print ("Device:   ", ld.dev_id, "On application:", ld.app_id, " with APPeui:", APP_eui, "DEVeui:", DEV_eui, "DEVaddr:", DEV_addr, "APPkey:", APP_key, "Last Seen:", tme.strftime("%y-%m-%d %H:%M:%S"))    
+         print ("DevAppKey:", getdevappkey(app_client, TTN_dev_id), "\n")
       except Exception as e:
-         print ("Device:", dev_id, "with MAC:", MAC, "Not registered on the TTN Error: ", e, "\n")
+         print ("Device:", TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN Error: ", e, "\n")
+
+   # end of if ttnopt
+   
+   if helopt:			# if Helium registration
+      print ("Helium network activity...")
+      HEL_dev_id       = flarmid.lower()
+      HEL_dev_eui      = "0000"+MAC
+      HEL_name         = "OGN/IGC Tracker "+HEL_dev_id+" "+regist 
+      HEL_DEVID        = getHEL_DEVID(HEL_dev_eui)			# get the Hellium ID for the list of devices
+      if HEL_DEVID != 0:	# just report that exists
+         print ("Helium DEVID:", HEL_DEVID, "exists for eui:", HEL_dev_eui, "deleting it now ...")
+         url=HEL_URL+'/'+HEL_DEVID
+         r = requests.delete(url, headers=HEL_header)         		# open the url resource
+         if r.status_code != 200:
+            print("ERROR: Device NOT deleted: ", r.status_code, '\n')
+      payload = {"name":    HEL_name, 					# prepare the POST request
+                 "app_eui": HEL_app_eui, 
+                 "app_key": HEL_app_key, 
+                 "dev_eui": HEL_dev_eui}
+      r = requests.post(HEL_URL, headers=HEL_header, data=payload)      # open the url resource
+      if r.status_code != 200 and r.status_code != 422 and r.status_code != 201:
+         print("ERROR Creating device RC:", r.status_code, '\n\n')
+      HEL_DEVID        = getHEL_DEVID(HEL_dev_eui)
+      if HEL_DEVID == 0:
+         print ("ERROR: device not created\n")
+      print ("Helium DEVID:", HEL_DEVID, "created for eui:", HEL_dev_eui)
+      r = requests.post(HEL_URL+'/'+HEL_DEVID+'/labels', headers=HEL_header, data=label)         # open the url resource
+      if r.status_code != 200:
+         print("ERROR: Add label to device:", r.status_code, '\n')
+      url=HEL_URL+'/'+HEL_DEVID
+      #print (url, '\n\n')
+      r = requests.get(url, headers=HEL_header)         		# open the url resource
+      if r.status_code != 200:
+         print("ERROR: Device data RC: ", r.status_code, '\n')
+      print("Device data :", json.dumps(r.json(), indent=4))
+      print ("Device:   ", HEL_DEVID,  " with APPeui:", HEL_app_eui, "DEVeui:", HEL_dev_eui, "DEVaddr:", HEL_dev_eui, "APPkey:", HEL_app_key, "Name: ", HEL_name, "\n\n")    
+   # end of if helopt
 
 # ------------------------------------------------------------------ #
 
