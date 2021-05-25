@@ -14,6 +14,7 @@ import os
 import binascii
 import base64
 import requests
+import netparams as net
 
 
 def signal_term_handler(signal, frame):
@@ -22,18 +23,18 @@ def signal_term_handler(signal, frame):
     os._exit(0)
 
 ########
-def getdevappkey(app_client, TTN_dev_id):		# get the TTN app key from device id
-    device      = app_client.device(TTN_dev_id)
-    ld= device.lorawan_device
-    APP_key  = binascii.b2a_hex(ld.app_key).decode('utf-8').upper()
+def getdevappkey(app_client, dev_id):		# get the TTN app key from device id
+    device      = app_client.device(dev_id)	# instantiate the device
+    ld= device.lorawan_device			# get the device
+    APP_key  = binascii.b2a_hex(ld.app_key).decode('utf-8').upper() # convert to HEX
     return (APP_key)
 
 ########
-def getHEL_DEVID(HEL_dev_eui):				# return the Helium ID based on the lorawan EUI
-    r = requests.get(HEL_URL, headers=HEL_header)         	# get the list of devices
+def getHEL_DEVID(dev_eui):				# return the Helium ID based on the lorawan EUI
+    r = requests.get(net.HEL_URL, headers=net.HEL_header)         	# get the list of devices
     devices=r.json()					# read the data
     for dev in devices:
-        if dev['dev_eui'] == HEL_dev_eui:		# it is our dev-eui ??
+        if dev['dev_eui'] == dev_eui:			# it is our dev-eui ??
            return (dev['id'])				# return tghe Helium ID
     return 0
 
@@ -145,33 +146,6 @@ def setregdata(mac, reg, devid, uniqueid, publickey, prt=True):         # set th
 signal.signal(signal.SIGTERM, signal_term_handler)
 # .....................................................................#
 
-# TheThingsNetwork (TTN) parameters
-#
-TTN_app_id     = "ogn"
-TTN_dev_id     = ""
-TTN_appEui     = "70B3D57ED0035895"
-TTN_appKey     = "ttn-account-v2.V4Z-WSzqhfR0FKiKFYu4VLgNEbxP9QluACwD1pSfwmE"
-#
-
-# Helium Parameters
-#
-#Parameter Name	        Type	Description
-#name (required)	string	A human-friendly name for the device
-#app_eui (required)	string	LoRaWAN Application EUI
-#app_key (required)	string	LoRaWAN Application Key
-#dev_eui (required)	string	LoRaWAN Device EUI
-#
-HEL_name      = ""
-HEL_dev_eui   = ""
-
-HEL_DEVID     = ""
-HEL_app_eui   = "70B3D57ED0035895"
-HEL_app_key   = "862F5857054E149A1CC9BFBB569061F3"
-HEL_uuid_label= "219db7ef-9180-464b-bf3a-18764706aa70"
-label         = {"label":   HEL_uuid_label}
-HEL_header    = {"key": "929DkyxXnBXu+pf4sMDbld6I4xXP8vwbOLmTJD3oWO8"}
-HEL_URL       = "https://console.helium.com/api/v1/devices"
-LAB_URL       = "https://console.helium.com/api/v1/labels"
 
 #######
 # --------------------------------------#
@@ -232,6 +206,9 @@ if encr == "True":		# set encryption mode
    encr = True
 else:
    encr = False			
+
+if ttnopt and helopt:
+   print("ERROR: Both networks TTN & Helium can not be chosen at the same time !!!\n\n")
 
 # --------------------------------------#
 keyfilename=keyfile		# name of the file containing the encryption keys
@@ -376,13 +353,13 @@ else:				# deprecated code
 print( "==============================================================================================\n\n")
 
 if found:			# set the last one !!!
-   APP_key=''
-   if ttnopt:			# if TTN registration
+   APP_key=''			# for the $POGNS cmd
+   if ttnopt and not helopt:			# if TTN registration
       print ("TheThingsNetwork (TTN) network activity...")
 
       devicetest = {      	# the device dict
         "description"     : "OGN/IGC-"+regist+" ",
-        "appEui"          : TTN_appEui,
+        "appEui"          : net.TTN_appEui,
         "devEui"          : "0000"+MAC,
         "appKey"          : binascii.b2a_hex(os.urandom(16)).upper(), 
         "fCntUp"          : 10,
@@ -395,20 +372,20 @@ if found:			# set the last one !!!
         "attributes"      : { "info": compid},
       }
       # ------------------------------------------------------------------ #
-      TTN_dev_id      = flarmid.lower()
-      handler     = ttn.HandlerClient    (TTN_app_id, TTN_appKey)
-      app_client  = ttn.ApplicationClient(TTN_app_id, TTN_appKey, handler_address="", cert_content="/home/angel/.ssh/id_ras.pub", discovery_address="discovery.thethings.network:1900")
+      net.TTN_dev_id      = flarmid.lower()
+      handler     = ttn.HandlerClient    (net.TTN_app_id, net.TTN_appKey)
+      app_client  = ttn.ApplicationClient(net.TTN_app_id, net.TTN_appKey, handler_address="", cert_content="/home/angel/.ssh/id_ras.pub", discovery_address="discovery.thethings.network:1900")
       if setup:
          try:
-            app_client.delete_device  (TTN_dev_id)
+            app_client.delete_device  (net.TTN_dev_id)
          except:
-            print ("Deleting Device:", TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN\n")
+            print ("Deleting Device:", net.TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN\n")
          try:   
-            app_client.register_device(TTN_dev_id, devicetest)
+            app_client.register_device(net.TTN_dev_id, devicetest)
          except Exception as e:
-            print ("Registering  Device error:", TTN_dev_id, "with MAC:", MAC,"Error:", e, "\n")
+            print ("Registering  Device error:", net.TTN_dev_id, "with MAC:", MAC,"Error:", e, "\n")
       try:
-         device      = app_client.device(TTN_dev_id)
+         device      = app_client.device(net.TTN_dev_id)
          ld          = device.lorawan_device
          APP_eui     = binascii.b2a_hex(ld.app_eui).decode('utf-8').upper()
          DEV_eui     = binascii.b2a_hex(ld.dev_eui).decode('utf-8').upper()
@@ -417,45 +394,49 @@ if found:			# set the last one !!!
          lastseen    = int(ld.last_seen/1000000000)
          tme         = datetime.datetime.utcfromtimestamp(lastseen)
          print ("Device:   ", ld.dev_id, "On application:", ld.app_id, " with APPeui:", APP_eui, "DEVeui:", DEV_eui, "DEVaddr:", DEV_addr, "APPkey:", APP_key, "Last Seen:", tme.strftime("%y-%m-%d %H:%M:%S"))    
-         print ("DevAppKey:", getdevappkey(app_client, TTN_dev_id), "\n")
+         print ("DevAppKey:", getdevappkey(app_client, net.TTN_dev_id), "\n")
+
+         #cmd="$POGNS,AppKey="+APP_key+"\n"
+         #print(cmd)
       except Exception as e:
-         print ("Device:", TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN Error: ", e, "\n")
+         print ("Device:", net.TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN Error: ", e, "\n")
 
    # end of if ttnopt
    
-   if helopt:			# if Helium registration
+   if helopt and not ttnopt:			# if Helium registration
       print ("Helium network activity...")
-      HEL_dev_id       = flarmid.lower()
-      HEL_dev_eui      = "0000"+MAC
-      HEL_name         = "OGN/IGC Tracker "+HEL_dev_id+" "+regist 
-      HEL_DEVID        = getHEL_DEVID(HEL_dev_eui)			# get the Hellium ID for the list of devices
-      if HEL_DEVID != 0:	# just report that exists
-         print ("Helium DEVID:", HEL_DEVID, "exists for eui:", HEL_dev_eui, "deleting it now ...")
-         url=HEL_URL+'/'+HEL_DEVID
-         r = requests.delete(url, headers=HEL_header)         		# open the url resource
+      net.HEL_dev_id       = flarmid.lower()
+      net.HEL_dev_eui      = "0000"+MAC
+      net.HEL_name         = "OGN/IGC Tracker "+net.HEL_dev_id+" "+regist 
+      net.HEL_DEVID        = getHEL_DEVID(net.HEL_dev_eui)			# get the Hellium ID for the list of devices
+      if net.HEL_DEVID != 0:	# just report that exists
+         print ("Helium DEVID:", net.HEL_DEVID, "exists for eui:", net.HEL_dev_eui, "deleting it now ...")
+         url=net.HEL_URL+'/'+net.HEL_DEVID
+         r = requests.delete(url, headers=net.HEL_header)         		# open the url resource
          if r.status_code != 200:
-            print("ERROR: Device NOT deleted: ", r.status_code, '\n')
-      payload = {"name":    HEL_name, 					# prepare the POST request
-                 "app_eui": HEL_app_eui, 
-                 "app_key": HEL_app_key, 
-                 "dev_eui": HEL_dev_eui}
-      r = requests.post(HEL_URL, headers=HEL_header, data=payload)      # open the url resource
+            print("ERROR: Device NOT deleted: ", r.status_code, '!!!\n')
+      payload = {"name":    net.HEL_name, 					# prepare the POST request
+                 "app_eui": net.HEL_app_eui, 
+                 "app_key": net.HEL_app_key, 
+                 "dev_eui": net.HEL_dev_eui}
+      r = requests.post(net.HEL_URL, headers=net.HEL_header, data=payload)      # open the url resource
       if r.status_code != 200 and r.status_code != 422 and r.status_code != 201:
-         print("ERROR Creating device RC:", r.status_code, '\n\n')
-      HEL_DEVID        = getHEL_DEVID(HEL_dev_eui)
-      if HEL_DEVID == 0:
-         print ("ERROR: device not created\n")
-      print ("Helium DEVID:", HEL_DEVID, "created for eui:", HEL_dev_eui)
-      r = requests.post(HEL_URL+'/'+HEL_DEVID+'/labels', headers=HEL_header, data=label)         # open the url resource
+         print("ERROR: Creating device RC:", r.status_code, '!!!\n\n')
+      net.HEL_DEVID        = getHEL_DEVID(net.HEL_dev_eui)
+      if net.HEL_DEVID == 0:
+         print("ERROR: device not created !!!\n")
+      print ("Helium DEVID:", net.HEL_DEVID, "created for eui:", net.HEL_dev_eui)
+      r = requests.post(net.HEL_URL+'/'+net.HEL_DEVID+'/labels', headers=net.HEL_header, data=net.HEL_label)         # open the url resource
       if r.status_code != 200:
-         print("ERROR: Add label to device:", r.status_code, '\n')
-      url=HEL_URL+'/'+HEL_DEVID
+         print("ERROR: Add label to device:", r.status_code, '!!!\n')
+      url=net.HEL_URL+'/'+net.HEL_DEVID
       #print (url, '\n\n')
-      r = requests.get(url, headers=HEL_header)         		# open the url resource
+      r = requests.get(url, headers=net.HEL_header)         		# open the url resource
       if r.status_code != 200:
-         print("ERROR: Device data RC: ", r.status_code, '\n')
+         print("ERROR: Device data RC: ", r.status_code, '!!!\n')
       print("Device data :", json.dumps(r.json(), indent=4))
-      print ("Device:   ", HEL_DEVID,  " with APPeui:", HEL_app_eui, "DEVeui:", HEL_dev_eui, "DEVaddr:", HEL_dev_eui, "APPkey:", HEL_app_key, "Name: ", HEL_name, "\n\n")    
+      print("Device:   ", net.HEL_DEVID,  " with APPeui:", net.HEL_app_eui, "DEVeui:", net.HEL_dev_eui, "DEVaddr:", net.HEL_dev_eui, "APPkey:", net.HEL_app_key, "Name: ", net.HEL_name, "\n\n")    
+      APP_key=net.HEL_app_key						# for the $POGNS
    # end of if helopt
 
 # ------------------------------------------------------------------ #

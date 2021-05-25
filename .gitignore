@@ -7,3 +7,4 @@ testTTN.py
 ECDSAtest/
 .vscode
 helium/
+netparams.py
