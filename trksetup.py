@@ -4,7 +4,7 @@
 ######################################################################
 import argparse
 import serial
-from time import sleep          # use the sleep function
+from   time import sleep          # use the sleep function
 import time
 import ttn
 import json
@@ -155,8 +155,8 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 # --------------------------------------#
 #######
 print ("\n\nOGN tracker setup program:\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
-print ("Args: -p print ON|OFF, -u USB port, -s setup on|off, -k print the keys on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB")
-print ("============================================================================================================================================\n\n")
+print ("Args: -p print ON|OFF, -u USB port, -s setup on|off, -k print the keys on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm")
+print ("====================================================================================================================================================================================================================================================\n\n")
 parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
 parser.add_argument('-p', '--print',       required=False, dest='prt',      action='store', default=False)
 parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0)
@@ -168,6 +168,8 @@ parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      acti
 parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False)
 parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False)
 parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False)
+parser.add_argument('-a', '--pairing',     required=False, dest='pairing',  action='store', default='False')
+parser.add_argument('-w', '--owner',       required=False, dest='owner',    action='store', default='False')
 
 args  	= parser.parse_args()
 prt   	= args.prt		# print debugging
@@ -180,8 +182,10 @@ ttnopt	= args.ttn		# Register on the TheThingsNetwork (TTN)
 helopt	= args.helium		# Register on the Helium Network
 regopt	= args.reg		# register the device
 encr	= args.encr		# Set encryption mode
+pairing	= args.pairing		# Set pairing ONGT & FLARM
+owner	= args.owner		# Ownner of the FLARM to be paired
 
-if ognddb == "False":		# use the OGN DDB to get the data
+if ognddb == "False":		# use the OGN DDB to get t5yyhe data
    ognddb = False
 else:
    ognddb = True			
@@ -210,6 +214,25 @@ else:
 if ttnopt and helopt:
    print("ERROR: Both networks TTN & Helium can not be chosen at the same time !!!\n\n")
 
+if pairing == "False":		# use the OGN DDB to get t5yyhe data
+   pairing = False
+else:
+   import config		# get the configuration parameters
+   import MySQLdb               # the SQL data base routines
+				# open the DataBase
+   DBpath      = config.DBpath
+   DBhost      = config.DBhost
+   DBuser      = config.DBuser
+   DBpasswd    = config.DBpasswd
+   DBname      = config.DBname
+   conn = MySQLdb.connect(host=DBhost, user=DBuser, passwd=DBpasswd, db=DBname)
+   DBtable	="TRKDEVICES"	# table for storing the pairing information
+   ognddb	= True		# force true to use the OGN DDB
+   print("Pairing on MySQL: Database:", DBname, " at Host:", DBhost)
+   
+
+if owner == "False":		# use the OGN DDB to get t5yyhe data
+   owner = False
 # --------------------------------------#
 keyfilename=keyfile		# name of the file containing the encryption keys
 keyfilename='keyfile'		# name of the file containing the encryption keys
@@ -313,7 +336,7 @@ if ognddb:			# if using the OGN DDB
         pass			# nothing to do
    else:
         if prt:
-           print ("INFO: :::", info)
+           print ("INFO==>: ", info, "<== ")
         ogntid 	= info['device_id']	# OGN tracker ID
         if 'device_aprsid' in info:
             flarmid = info['device_aprsid']	# Flarmid id to be linked
@@ -357,16 +380,16 @@ if found:			# set the last one !!!
    if ttnopt and not helopt:			# if TTN registration
       print ("TheThingsNetwork (TTN) network activity...")
 
-      devicetest = {      	# the device dict
+      devicedict = {      	# the device dict
         "description"     : "OGN/IGC-"+regist+" ",
         "appEui"          : net.TTN_appEui,
         "devEui"          : "0000"+MAC,
         "appKey"          : binascii.b2a_hex(os.urandom(16)).upper(), 
         "fCntUp"          : 10,
         "fCntDown"        : 11,
-        "latitude"        : 100,
-        "longitude"       : 200,
-        "altitude"        : 300,
+        "latitude"        : 39,
+        "longitude"       : -3,
+        "altitude"        : 600,
         "disableFCntCheck": True,
         "uses32BitFCnt"   : True,
         "attributes"      : { "info": compid},
@@ -381,7 +404,7 @@ if found:			# set the last one !!!
          except:
             print ("Deleting Device:", net.TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN\n")
          try:   
-            app_client.register_device(net.TTN_dev_id, devicetest)
+            app_client.register_device(net.TTN_dev_id, devicedict)
          except Exception as e:
             print ("Registering  Device error:", net.TTN_dev_id, "with MAC:", MAC,"Error:", e, "\n")
       try:
@@ -438,6 +461,46 @@ if found:			# set the last one !!!
       print("Device:   ", net.HEL_DEVID,  " with APPeui:", net.HEL_app_eui, "DEVeui:", net.HEL_dev_eui, "DEVaddr:", net.HEL_dev_eui, "APPkey:", net.HEL_app_key, "Name: ", net.HEL_name, "\n\n")    
       APP_key=net.HEL_app_key						# for the $POGNS
    # end of if helopt
+   if pairing:					# if pairing the OGN TRACKER and a FLARMID ??
+      trk=flarmid							# the tracker that we want to pair
+      tflarmid=pairing							# with the flarm device
+      localtime = datetime.datetime.now()				# get today's date
+      today = localtime.strftime("%y/%m/%d %H:%M:%S")			# in string format yymmdd
+      if trk[0:3] != 'OGN' and (tflarmid[0:3] == 'FLR' or tflarmid[0:3] == 'ICA'):
+         print ("Pairing error, you can only pair OGN tracker with Flarms")
+         conn.close()
+         exit(-1)
+
+      conn = MySQLdb.connect(host=config.DBhost, user=config.DBuser, passwd=config.DBpasswd, db=DBname, connect_timeout=1000)     # connect with the database
+      cursD = conn.cursor()						# connect with the DB set the cursor
+      cmd1 = "DELETE FROM "+DBtable+" WHERE id = '"+trk+"' ;"
+      try:
+         cursD.execute(cmd1)						# delete the record on the DB
+      except MySQLdb.Error as e:
+         print ("SQL error: ",e)
+      conn.commit()
+      ognreg=getognreg(trk[3:])						# the the information fro the OGN DDB
+      flrreg=getognreg(tflarmid[3:])					# glider registration
+      cn=getogncn(tflarmid[3:])						# glider competition ID
+      model=getognmodel(tflarmid[3:])					# glider model
+      if not owner:
+         towner="IGC registration"					# dummy owner
+      else:
+         towner=owner							# use the owner parameter
+      if getognchk(trk[3:]) and getognchk(tflarmid[3:]):		# check that both devices are rgistered on the OGN DDB
+         cmd1 = "INSERT INTO "+DBtable+" (id, owner, spotid, compid, model, registration, active, devicetype, flarmid) VALUES ( '"+trk+"', '"+towner+"', '"+ognreg+"' , '"+cn+"', '"+model+"', '"+flrreg+"', '1', 'OGNT', '"+tflarmid+"' ) ; "
+         #print ("cmd1:",cmd1)
+         try:
+            cursD.execute(cmd1)
+         except MySQLdb.Error as e:
+            print ("Pairing error, ID already exist on the DB --- SQL error: ",e)
+         conn.commit()
+      else:
+         print ("ADD Pairing Error either the OGN tracker "+trk+" or the FlarmID "+tflarmid+" are not registered on the OGN DDB")
+         conn.close()
+         exit(0)
+      print ("PAIRING ==> ", trk, "with FlarmID", tflarmid, "and owner:", towner)
+   # end of if PAIRING
 
 # ------------------------------------------------------------------ #
 
