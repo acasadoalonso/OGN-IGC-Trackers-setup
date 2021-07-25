@@ -1,0 +1,25 @@
+base:
+  config: []
+  log:
+    level: info
+credentials-id: eu1.cloud.thethings.network
+input-format: json
+output-format: json
+allow-unknown-hosts: false
+oauth-server-address: https://eu1.cloud.thethings.network/oauth
+identity-server-grpc-address: eu1.cloud.thethings.network:8884
+gateway-server-enabled: true
+gateway-server-grpc-address: eu1.cloud.thethings.network:8884
+network-server-enabled: true
+network-server-grpc-address: eu1.cloud.thethings.network:8884
+application-server-enabled: true
+application-server-grpc-address: eu1.cloud.thethings.network:8884
+join-server-enabled: true
+join-server-grpc-address: eu1.cloud.thethings.network:8884
+device-template-converter-grpc-address: eu1.cloud.thethings.network:8884
+device-claiming-server-grpc-address: eu1.cloud.thethings.network:8884
+qr-code-generator-grpc-address: eu1.cloud.thethings.network:8884
+packet-broker-agent-grpc-address: eu1.cloud.thethings.network:8884
+insecure: false
+ca: /home/angel/snap/ttn-lw-stack/common/ca.9a02cb.pem
+dump-requests: false

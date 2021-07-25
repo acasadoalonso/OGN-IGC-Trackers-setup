@@ -380,10 +380,12 @@ if found:			# set the last one !!!
    if ttnopt and not helopt:			# if TTN registration
       print ("TheThingsNetwork (TTN) network activity...")
 
+      net.TTN_dev_id      = flarmid.lower()
+      net.TTN_dev_Eui     = "0000"+MAC
       devicedict = {      	# the device dict
         "description"     : "OGN/IGC-"+regist+" ",
         "appEui"          : net.TTN_appEui,
-        "devEui"          : "0000"+MAC,
+        "devEui"          : net.TTN.dev_Eui, 
         "appKey"          : binascii.b2a_hex(os.urandom(16)).upper(), 
         "fCntUp"          : 10,
         "fCntDown"        : 11,
@@ -395,7 +397,6 @@ if found:			# set the last one !!!
         "attributes"      : { "info": compid},
       }
       # ------------------------------------------------------------------ #
-      net.TTN_dev_id      = flarmid.lower()
       handler     = ttn.HandlerClient    (net.TTN_app_id, net.TTN_appKey)
       app_client  = ttn.ApplicationClient(net.TTN_app_id, net.TTN_appKey, handler_address="", cert_content="/home/angel/.ssh/id_ras.pub", discovery_address="discovery.thethings.network:1900")
       if setup:
@@ -418,9 +419,13 @@ if found:			# set the last one !!!
          tme         = datetime.datetime.utcfromtimestamp(lastseen)
          print ("Device:   ", ld.dev_id, "On application:", ld.app_id, " with APPeui:", APP_eui, "DEVeui:", DEV_eui, "DEVaddr:", DEV_addr, "APPkey:", APP_key, "Last Seen:", tme.strftime("%y-%m-%d %H:%M:%S"))    
          print ("DevAppKey:", getdevappkey(app_client, net.TTN_dev_id), "\n")
-
-         #cmd="$POGNS,AppKey="+APP_key+"\n"
-         #print(cmd)
+         # add now the TTN V3 
+         clicmd = "ttn-lw-cli end-devices delete ogn "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+TTN_devEui+" --join-eui "+net.TTN_appEui+" " 
+         print (clicmd)
+         os.system(clicmd)
+         clicmd = "ttn-lw-cli end-devices create ogn "+net.TTN_dev_id+" --name "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+TTN_devEui+" --join-eui "+net.TTN_appEui+" --description OGN/IGC-"+regist+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a" 
+         print (clicmd)
+         os.system(clicmd)
       except Exception as e:
          print ("Device:", net.TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN Error: ", e, "\n")
 
@@ -519,8 +524,9 @@ if found:			# set the last one !!!
         ser.write(cmd.encode('UTF-8'))
         cmd="$POGNS,Type="+str(devtype)+"\n"
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,AppKey="+APP_key+"\n"
-        ser.write(cmd.encode('UTF-8'))
+        if APP_key != '':
+           cmd="$POGNS,AppKey="+APP_key+"\n"
+           ser.write(cmd.encode('UTF-8'))
         ser.write(etx)		# send a Ctrl-C 
         sleep(1)		# wait a second to give a chance to receive the data
         printparams(ser, trkcfg, False)# print the new parameters

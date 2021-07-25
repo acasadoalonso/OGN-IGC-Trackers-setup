@@ -1,0 +1,989 @@
+{
+    "end_devices": [
+        {
+            "ids": {
+                "device_id": "avionix-ogn8e256c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000CC50E38E256C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:30.521Z",
+            "updated_at": "2021-05-31T08:52:30.521Z"
+        },
+        {
+            "ids": {
+                "device_id": "avionix-ogn8e25c8",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000CC50E38E25C8",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:30.701Z",
+            "updated_at": "2021-05-31T08:52:30.701Z"
+        },
+        {
+            "ids": {
+                "device_id": "avionix-ognc308cc",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC308CC",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:30.943Z",
+            "updated_at": "2021-05-31T08:52:30.943Z"
+        },
+        {
+            "ids": {
+                "device_id": "avionix-ognc30a0c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30A0C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:31.083Z",
+            "updated_at": "2021-05-31T08:52:31.083Z"
+        },
+        {
+            "ids": {
+                "device_id": "heltec-jean-do",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "000030AEA46EF2A0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:31.238Z",
+            "updated_at": "2021-05-31T08:52:31.238Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn0c3f94",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00003C61050C3F94",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:07.910Z",
+            "updated_at": "2021-05-30T19:08:07.910Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn0d5a54",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00003C61050D5A54",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:08.084Z",
+            "updated_at": "2021-05-30T19:08:08.084Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn1bae2c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B21BAE2C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:16.617Z",
+            "updated_at": "2021-05-30T19:08:16.617Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn24e228",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000A4CF1224E228",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:08.251Z",
+            "updated_at": "2021-05-30T19:08:08.251Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn24e244",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000A4CF1224E244",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:08.401Z",
+            "updated_at": "2021-05-30T19:08:08.401Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn24e248",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000A4CF1224E248",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:08.547Z",
+            "updated_at": "2021-05-30T19:08:08.547Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn24e258",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000A4CF1224E258",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:08.721Z",
+            "updated_at": "2021-05-30T19:08:08.721Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn24e2b0",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000A4CF1224E2B0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:08.956Z",
+            "updated_at": "2021-05-30T19:08:08.956Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn24e3a0",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000A4CF1224E3A0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:09.109Z",
+            "updated_at": "2021-05-30T19:08:09.109Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn5923fc",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00003C71BF5923FC",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:16.764Z",
+            "updated_at": "2021-05-30T19:08:16.764Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn5ac0d4",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00003C71BF5AC0D4",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:09.255Z",
+            "updated_at": "2021-05-30T19:08:09.255Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn5ac4c4",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00003C71BF5AC4C4",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:09.404Z",
+            "updated_at": "2021-05-30T19:08:09.404Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn60e6a0",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00003C71BF60E6A0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:09.552Z",
+            "updated_at": "2021-05-30T19:08:09.552Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn637b78",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "000010521C637B78",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:09.701Z",
+            "updated_at": "2021-05-30T19:08:09.701Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn637c70",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "000010521C637C70",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:17.055Z",
+            "updated_at": "2021-05-30T19:08:17.055Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6380e8",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "000010521C6380E8",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:09.847Z",
+            "updated_at": "2021-05-30T19:08:09.847Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6a8fe5",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000C44F336A8FE5",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:09.995Z",
+            "updated_at": "2021-05-30T19:08:09.995Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6acf11",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000C44F336ACF11",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:10.176Z",
+            "updated_at": "2021-05-30T19:08:10.176Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6acf71",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000C44F336ACF71",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:10.323Z",
+            "updated_at": "2021-05-30T19:08:10.323Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6c7aec",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26C7AEC",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:10.467Z",
+            "updated_at": "2021-05-30T19:08:10.467Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6c7b40",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26C7B40",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:10.615Z",
+            "updated_at": "2021-05-30T19:08:10.615Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6c7b48",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26C7B48",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:10.759Z",
+            "updated_at": "2021-05-30T19:08:10.759Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6c7b4c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26C7B4C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:17.201Z",
+            "updated_at": "2021-05-30T19:08:17.201Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6c7b60",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26C7B60",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:10.909Z",
+            "updated_at": "2021-05-30T19:08:10.909Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6c7db8",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26C7DB8",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:31.380Z",
+            "updated_at": "2021-05-31T08:52:31.380Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cabf8",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CABF8",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:31.538Z",
+            "updated_at": "2021-05-31T08:52:31.538Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac14",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC14",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:31.679Z",
+            "updated_at": "2021-05-31T08:52:31.679Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac20",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC20",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:31.821Z",
+            "updated_at": "2021-05-31T08:52:31.821Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac34",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC34",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:31.970Z",
+            "updated_at": "2021-05-31T08:52:31.970Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac38",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC38",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:32.115Z",
+            "updated_at": "2021-05-31T08:52:32.115Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac40",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC40",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:11.061Z",
+            "updated_at": "2021-05-30T19:08:11.061Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac44",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC44",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:11.208Z",
+            "updated_at": "2021-05-30T19:08:11.208Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac48",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC48",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:11.355Z",
+            "updated_at": "2021-05-30T19:08:11.355Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac70",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC70",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:11.502Z",
+            "updated_at": "2021-05-30T19:08:11.502Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac78",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC78",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:11.649Z",
+            "updated_at": "2021-05-30T19:08:11.649Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac7c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC7C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:11.802Z",
+            "updated_at": "2021-05-30T19:08:11.802Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac80",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC80",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:17.349Z",
+            "updated_at": "2021-05-30T19:08:17.349Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac8c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC8C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:11.957Z",
+            "updated_at": "2021-05-30T19:08:11.957Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn6cac94",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000AC67B26CAC94",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:12.104Z",
+            "updated_at": "2021-05-30T19:08:12.104Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn88e240",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00003C71BF88E240",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:12.431Z",
+            "updated_at": "2021-05-30T19:08:12.431Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogn8e20f0",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000CC50E38E20F0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:12.577Z",
+            "updated_at": "2021-05-30T19:08:12.577Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognbf90f8",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABBF90F8",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:12.721Z",
+            "updated_at": "2021-05-30T19:08:12.721Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognbf9174",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABBF9174",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:12.870Z",
+            "updated_at": "2021-05-30T19:08:12.870Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30728",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30728",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:13.023Z",
+            "updated_at": "2021-05-30T19:08:13.023Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30734",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30734",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:13.183Z",
+            "updated_at": "2021-05-30T19:08:13.183Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc307e0",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC307E0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:17.498Z",
+            "updated_at": "2021-05-30T19:08:17.498Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30824",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30824",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:13.328Z",
+            "updated_at": "2021-05-30T19:08:13.328Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30840",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30840",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:13.479Z",
+            "updated_at": "2021-05-30T19:08:13.479Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30854",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30854",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:13.621Z",
+            "updated_at": "2021-05-30T19:08:13.621Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30864",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30864",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:13.771Z",
+            "updated_at": "2021-05-30T19:08:13.771Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc3088c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC3088C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:32.259Z",
+            "updated_at": "2021-05-31T08:52:32.259Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30898",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30898",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:13.914Z",
+            "updated_at": "2021-05-30T19:08:13.914Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc308c4",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC308C4",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:14.059Z",
+            "updated_at": "2021-05-30T19:08:14.059Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc308dc",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC308DC",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:14.202Z",
+            "updated_at": "2021-05-30T19:08:14.202Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc3091c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC3091C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:14.350Z",
+            "updated_at": "2021-05-30T19:08:14.350Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30930",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30930",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:14.509Z",
+            "updated_at": "2021-05-30T19:08:14.509Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30978",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30978",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:14.655Z",
+            "updated_at": "2021-05-30T19:08:14.655Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc309e4",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC309E4",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:14.798Z",
+            "updated_at": "2021-05-30T19:08:14.798Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30a18",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30A18",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:14.943Z",
+            "updated_at": "2021-05-30T19:08:14.943Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30a28",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30A28",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:32.401Z",
+            "updated_at": "2021-05-31T08:52:32.401Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30a2c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30A2C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:15.087Z",
+            "updated_at": "2021-05-30T19:08:15.087Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30ac8",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30AC8",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:15.235Z",
+            "updated_at": "2021-05-30T19:08:15.235Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc30ad0",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABC30AD0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:15.382Z",
+            "updated_at": "2021-05-30T19:08:15.382Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognc423bc",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000807D3AC423BC",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:15.527Z",
+            "updated_at": "2021-05-30T19:08:15.527Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognddd218",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABDDD218",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:15.675Z",
+            "updated_at": "2021-05-30T19:08:15.675Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognddd224",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABDDD224",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:15.832Z",
+            "updated_at": "2021-05-30T19:08:15.832Z"
+        },
+        {
+            "ids": {
+                "device_id": "ogne66e98",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000807D3AE66E98",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:15.978Z",
+            "updated_at": "2021-05-30T19:08:15.978Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognf0c140",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00007C9EBDF0C140",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:16.146Z",
+            "updated_at": "2021-05-30T19:08:16.146Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognf8803c",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00002462ABF8803C",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:16.293Z",
+            "updated_at": "2021-05-30T19:08:16.293Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognfc2710",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00007C9EBDFC2710",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-30T19:08:16.459Z",
+            "updated_at": "2021-05-30T19:08:16.459Z"
+        },
+        {
+            "ids": {
+                "device_id": "ognrakac",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "00E314B43FB5DDF8",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:32.546Z",
+            "updated_at": "2021-05-31T08:52:32.546Z"
+        },
+        {
+            "ids": {
+                "device_id": "seb-tracker-followme-ogn8e3198",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000CC50E38E3198",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:32.690Z",
+            "updated_at": "2021-05-31T08:52:32.690Z"
+        },
+        {
+            "ids": {
+                "device_id": "soft-test",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "1234CC50E38E31A0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:33.173Z",
+            "updated_at": "2021-05-31T08:52:33.173Z"
+        },
+        {
+            "ids": {
+                "device_id": "stx02a9cb",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "495B00003502A9CB",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-06-01T10:08:51.465Z",
+            "updated_at": "2021-06-01T10:08:51.465Z"
+        },
+        {
+            "ids": {
+                "device_id": "t-beam-jean-do",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000C44F336AB4E1",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:33.331Z",
+            "updated_at": "2021-05-31T08:52:33.331Z"
+        },
+        {
+            "ids": {
+                "device_id": "t-beam-lcd-test",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000246F2899C124",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:33.690Z",
+            "updated_at": "2021-05-31T08:52:33.690Z"
+        },
+        {
+            "ids": {
+                "device_id": "test-tracker",
+                "application_ids": {
+                    "application_id": "ogn"
+                },
+                "dev_eui": "0000CC50E38E31A0",
+                "join_eui": "70B3D57ED0035895"
+            },
+            "created_at": "2021-05-31T08:52:33.836Z",
+            "updated_at": "2021-05-31T08:52:33.836Z"
+        }
+    ]
+}
+len: 82
