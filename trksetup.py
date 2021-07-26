@@ -376,54 +376,18 @@ else:				# deprecated code
 print( "==============================================================================================\n\n")
 
 if found:			# set the last one !!!
-   APP_key=''			# for the $POGNS cmd
-   if ttnopt and not helopt:			# if TTN registration
+   APP_key=net.TTN_App_Key	# for the $POGNS cmd
+   if ttnopt and not helopt:	# if TTN registration
       print ("TheThingsNetwork (TTN) network activity...")
 
       net.TTN_dev_id      = flarmid.lower()
       net.TTN_dev_Eui     = "0000"+MAC
-      devicedict = {      	# the device dict
-        "description"     : "OGN/IGC-"+regist+" ",
-        "appEui"          : net.TTN_appEui,
-        "devEui"          : net.TTN.dev_Eui, 
-        "appKey"          : binascii.b2a_hex(os.urandom(16)).upper(), 
-        "fCntUp"          : 10,
-        "fCntDown"        : 11,
-        "latitude"        : 39,
-        "longitude"       : -3,
-        "altitude"        : 600,
-        "disableFCntCheck": True,
-        "uses32BitFCnt"   : True,
-        "attributes"      : { "info": compid},
-      }
-      # ------------------------------------------------------------------ #
-      handler     = ttn.HandlerClient    (net.TTN_app_id, net.TTN_appKey)
-      app_client  = ttn.ApplicationClient(net.TTN_app_id, net.TTN_appKey, handler_address="", cert_content="/home/angel/.ssh/id_ras.pub", discovery_address="discovery.thethings.network:1900")
-      if setup:
-         try:
-            app_client.delete_device  (net.TTN_dev_id)
-         except:
-            print ("Deleting Device:", net.TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN\n")
-         try:   
-            app_client.register_device(net.TTN_dev_id, devicedict)
-         except Exception as e:
-            print ("Registering  Device error:", net.TTN_dev_id, "with MAC:", MAC,"Error:", e, "\n")
       try:
-         device      = app_client.device(net.TTN_dev_id)
-         ld          = device.lorawan_device
-         APP_eui     = binascii.b2a_hex(ld.app_eui).decode('utf-8').upper()
-         DEV_eui     = binascii.b2a_hex(ld.dev_eui).decode('utf-8').upper()
-         DEV_addr    = binascii.b2a_hex(ld.dev_addr).decode('utf-8').upper()
-         APP_key     = binascii.b2a_hex(ld.app_key).decode('utf-8').upper()
-         lastseen    = int(ld.last_seen/1000000000)
-         tme         = datetime.datetime.utcfromtimestamp(lastseen)
-         print ("Device:   ", ld.dev_id, "On application:", ld.app_id, " with APPeui:", APP_eui, "DEVeui:", DEV_eui, "DEVaddr:", DEV_addr, "APPkey:", APP_key, "Last Seen:", tme.strftime("%y-%m-%d %H:%M:%S"))    
-         print ("DevAppKey:", getdevappkey(app_client, net.TTN_dev_id), "\n")
          # add now the TTN V3 
-         clicmd = "ttn-lw-cli end-devices delete ogn "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+TTN_devEui+" --join-eui "+net.TTN_appEui+" " 
+         clicmd = "ttn-lw-cli end-devices delete ogn "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_appEui+" " 
          print (clicmd)
          os.system(clicmd)
-         clicmd = "ttn-lw-cli end-devices create ogn "+net.TTN_dev_id+" --name "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+TTN_devEui+" --join-eui "+net.TTN_appEui+" --description OGN/IGC-"+regist+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a" 
+         clicmd = "ttn-lw-cli end-devices create ogn "+net.TTN_dev_id+" --name "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_appEui+" --description OGN/IGC-"+regist+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a" 
          print (clicmd)
          os.system(clicmd)
       except Exception as e:
