@@ -9,3 +9,4 @@ ECDSAtest/
 helium/
 ttnv3/
 netparams.py
+.ttn-lw-cli.yml
