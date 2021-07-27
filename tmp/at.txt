@@ -1,0 +1,1 @@
+at+set_config=lora:app_key:BD9ABA7CD448662BFA41FDA8BDE1648A   at+get_config=device:status at+get_config=lora:status

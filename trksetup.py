@@ -155,8 +155,10 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 # --------------------------------------#
 #######
 print ("\n\nOGN tracker setup program:\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
-print ("Args: -p print ON|OFF, -u USB port, -s setup on|off, -k print the keys on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm")
-print ("====================================================================================================================================================================================================================================================\n\n")
+print ("\n\nArgs: -p print ON|OFF, -u USB port, -s setup on|off, -k print the keys on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing")
+#					  report the program version based on file date
+print("Program Version:", time.ctime(os.path.getmtime(__file__)))
+print ("==========================================================================================================================================================================================\n\n")
 parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
 parser.add_argument('-p', '--print',       required=False, dest='prt',      action='store', default=False)
 parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0)
@@ -225,9 +227,9 @@ else:
    DBuser      = config.DBuser
    DBpasswd    = config.DBpasswd
    DBname      = config.DBname
+   DBtable     ="TRKDEVICES"	# table for storing the pairing information
+   ognddb      = True		# force true to use the OGN DDB
    conn = MySQLdb.connect(host=DBhost, user=DBuser, passwd=DBpasswd, db=DBname)
-   DBtable	="TRKDEVICES"	# table for storing the pairing information
-   ognddb	= True		# force true to use the OGN DDB
    print("Pairing on MySQL: Database:", DBname, " at Host:", DBhost)
    
 
@@ -394,6 +396,7 @@ if found:			# set the last one !!!
          print ("Device:", net.TTN_dev_id, "with MAC:", MAC, "Not registered on the TTN Error: ", e, "\n")
 
    # end of if ttnopt
+# ------------------------------------------------------------------ #
    
    if helopt and not ttnopt:			# if Helium registration
       print ("Helium network activity...")
@@ -430,7 +433,8 @@ if found:			# set the last one !!!
       print("Device:   ", net.HEL_DEVID,  " with APPeui:", net.HEL_app_eui, "DEVeui:", net.HEL_dev_eui, "DEVaddr:", net.HEL_dev_eui, "APPkey:", net.HEL_app_key, "Name: ", net.HEL_name, "\n\n")    
       APP_key=net.HEL_app_key						# for the $POGNS
    # end of if helopt
-   if pairing:					# if pairing the OGN TRACKER and a FLARMID ??
+# ------------------------------------------------------------------ #
+   if pairing:								# if pairing the OGN TRACKER and a FLARMID ??
       trk=flarmid							# the tracker that we want to pair
       tflarmid=pairing							# with the flarm device
       localtime = datetime.datetime.now()				# get today's date
@@ -442,25 +446,25 @@ if found:			# set the last one !!!
 
       conn = MySQLdb.connect(host=config.DBhost, user=config.DBuser, passwd=config.DBpasswd, db=DBname, connect_timeout=1000)     # connect with the database
       cursD = conn.cursor()						# connect with the DB set the cursor
-      cmd1 = "DELETE FROM "+DBtable+" WHERE id = '"+trk+"' ;"
+      cmd1 = "DELETE FROM "+DBtable+" WHERE id = '"+trk+"' ;"		# delete first from DB
       try:
          cursD.execute(cmd1)						# delete the record on the DB
       except MySQLdb.Error as e:
-         print ("SQL error: ",e)
+         print ("SQL error deleting pairing record: ",e, " may be OK or first time\n")
       conn.commit()
       ognreg=getognreg(trk[3:])						# the the information fro the OGN DDB
       flrreg=getognreg(tflarmid[3:])					# glider registration
       cn=getogncn(tflarmid[3:])						# glider competition ID
       model=getognmodel(tflarmid[3:])					# glider model
-      if not owner:
+      if not owner:							# if owner provided ???
          towner="IGC registration"					# dummy owner
       else:
          towner=owner							# use the owner parameter
       if getognchk(trk[3:]) and getognchk(tflarmid[3:]):		# check that both devices are rgistered on the OGN DDB
          cmd1 = "INSERT INTO "+DBtable+" (id, owner, spotid, compid, model, registration, active, devicetype, flarmid) VALUES ( '"+trk+"', '"+towner+"', '"+ognreg+"' , '"+cn+"', '"+model+"', '"+flrreg+"', '1', 'OGNT', '"+tflarmid+"' ) ; "
-         #print ("cmd1:",cmd1)
+         print ("Pairing cmd:",cmd1)
          try:
-            cursD.execute(cmd1)
+            cursD.execute(cmd1)						# insert the pairing record
          except MySQLdb.Error as e:
             print ("Pairing error, ID already exist on the DB --- SQL error: ",e)
          conn.commit()
@@ -468,12 +472,13 @@ if found:			# set the last one !!!
          print ("ADD Pairing Error either the OGN tracker "+trk+" or the FlarmID "+tflarmid+" are not registered on the OGN DDB")
          conn.close()
          exit(0)
-      print ("PAIRING ==> ", trk, "with FlarmID", tflarmid, "and owner:", towner)
+      print ("PAIRING ==> ", trk, "with FlarmID", tflarmid, "and owner:", towner, "on DBhost:", config.DBhost, "\n\n")
    # end of if PAIRING
 
 # ------------------------------------------------------------------ #
 
-   if setup:			# if setup is required 
+   if setup:								# if setup is required 
+									# use the $POGNS cmd to set the parameters ...
         cmd="$POGNS,Reg="+regist+"\n"
         ser.write(cmd.encode('UTF-8'))
         cmd="$POGNS,Pilot="+pilot+"\n"
@@ -491,17 +496,18 @@ if found:			# set the last one !!!
         if APP_key != '':
            cmd="$POGNS,AppKey="+APP_key+"\n"
            ser.write(cmd.encode('UTF-8'))
-        ser.write(etx)		# send a Ctrl-C 
-        sleep(1)		# wait a second to give a chance to receive the data
-        printparams(ser, trkcfg, False)# print the new parameters
+        ser.write(etx)							# send a Ctrl-C 
+        sleep(1)							# wait a second to give a chance to receive the data
+        printparams(ser, trkcfg, False) 				# print the new parameters
 
-   if regopt:			# if registration on the registration DB
+   if regopt:								# if registration on the registration DB
         print("PPP", MAC, regist, ID, uniqueid, publickey)
         r=setregdata(MAC, regist, ID, uniqueid, publickey)
         print ("Registration at server: ", r)
 
 else:
-   print("No information about the device "+ID+" on the databases !!!\n\n")
+   print("No information about the device "+ID+" on the OGN databases !!!\n\n")
 print( "==============================================================================================")
 ser.close()
+exit(0)
 ###################################################################################################################################################################

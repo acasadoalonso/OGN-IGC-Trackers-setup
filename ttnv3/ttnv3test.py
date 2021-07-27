@@ -39,7 +39,7 @@ auth="Bearer NNSXS.KWEZ5MIJBWBT36UYOIGDOW6WT6ECNJEI3Z5EODY.P4D4MVHM6HESSR6ZN4ITY
 #url= "https://eu1.cloud.thethings.network/api/v3/applications"
 #url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn"
 url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn/devices"
-#url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn/devices/ognc30734"
+url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn/devices/ognc30734"
 ###############################################################################################
 adddevice = {
   "ids": {
@@ -81,7 +81,8 @@ adddevice = {
 
 res=getapidata(url, auth)
 print (json.dumps(res, indent=4))
-print ("len:", len(res["end_devices"]))
+if "end_devices" in res:
+   print ("len:", len(res["end_devices"]))
 
 ######################
 #params = {'after': StartUtc,'Accept': 'text/event-stream'}

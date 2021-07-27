@@ -89,7 +89,7 @@ except:
 LogData = False
 if 'USER' in os.environ and prt:
 
-   print("Hostname:            ", hostname, " and config file: ", configfile, processid)
+   print("Hostname:            ", hostname, " and config file: ", configfile, "process ID:",processid)
    if MySQL:
       print("Config server values:",                  "MySQL =", MySQL, DBhost, DBuser, DBname, DBpath)
 # --------------------------------------#
