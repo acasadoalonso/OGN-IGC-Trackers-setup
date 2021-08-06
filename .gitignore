@@ -1,4 +1,6 @@
-key*
+keyfile
+keyfile.encrypt
+keypriv.PEM
 TRKSconfig.ini
 oldtrksetup/
 __pycache__/

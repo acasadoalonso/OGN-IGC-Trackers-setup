@@ -15,10 +15,10 @@
 # -w owner --owner OWNER
 if [ $# == 2 ]
 then
-   python3 trksetup.py --print True --setup True --printkeys True --ognddb True --encrypt False --ttn True --pairing $1 --owner $2
+   python3 trksetup.py --print True --setup True --printkeys False --ognddb True --encrypt False --ttn False --pairing $1 --owner $2
 elif [ $# == 1 ]
 then
-   python3 trksetup.py --print True --setup True --printkeys True --ognddb True --encrypt False --ttn True --pairing $1 
+   python3 trksetup.py --print True --setup True --printkeys False --ognddb True --encrypt False --ttn False --pairing $1 
 else
-   python3 trksetup.py --print True --setup True --printkeys True --ognddb True --encrypt False --ttn True 
+   python3 trksetup.py --print True --setup True --printkeys False --ognddb True --encrypt False --ttn False 
 fi
