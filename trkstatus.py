@@ -10,7 +10,7 @@ import config
 #   This script set the pairing between OGN trackers and flarms that are on the same glider, so it become a virtual single device
 #
 
-action='list'								# set the defaults
+action='full'								# set the defaults
 trk='ALL'
 #print (sys.argv)
 if len(sys.argv) >1:							# first arg is the action
@@ -53,6 +53,7 @@ nrecs=row[0]					# number of trackers pairs active
 sql0="SELECT   COUNT(DISTINCT(id)) FROM OGNTRKSTATUS ;"
 cmd0="SELECT   COUNT(*) FROM OGNTRKSTATUS ;"
 cmd1="SELECT * FROM OGNTRKSTATUS where source = 'STAT' and id in (select id from TRKDEVICES where active = 1 and devicetype = 'OGNT') ORDER BY otime DESC;"
+cmd1="SELECT * FROM OGNTRKSTATUS where source = 'STAT' and id in (select id from TRKDEVICES where devicetype = 'OGNT') ORDER BY otime DESC;"
 cmd2="SELECT * FROM OGNTRKSTATUS where source = 'STAT' and id = '"+trk+"' ORDER BY otime DESC;"
 cmd3="SELECT * FROM OGNTRKSTATUS ORDER BY otime DESC;"
 cmd4="SELECT DISTINCT (id) FROM `OGNTRKSTATUS`;" 

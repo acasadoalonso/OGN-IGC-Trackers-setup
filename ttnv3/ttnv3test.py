@@ -12,7 +12,7 @@ import requests
 # TheThingsNetwork (TTN) parameters
 #
 TTN_app_id     = "ogn"
-TTN_dev_id     = "ogn123456"
+TTN_dev_id     = "ogn6cac70"
 TTN_devEui     = "0000CC50E3123456"
 TTN_appEui     = "70B3D57ED0035895"
 TTN_joinEui    = TTN_appEui 				# "70B3D57ED0035895"
@@ -39,7 +39,7 @@ auth="Bearer NNSXS.KWEZ5MIJBWBT36UYOIGDOW6WT6ECNJEI3Z5EODY.P4D4MVHM6HESSR6ZN4ITY
 #url= "https://eu1.cloud.thethings.network/api/v3/applications"
 #url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn"
 url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn/devices"
-url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn/devices/ognc30734"
+url= "https://eu1.cloud.thethings.network/api/v3/applications/ogn/devices/ogn6cac70"
 ###############################################################################################
 adddevice = {
   "ids": {
@@ -97,6 +97,7 @@ headers = {
 clicmd = "ttn-lw-cli end-devices delete ogn "+TTN_dev_id+" -c .ttn-lw-cli.yml "
 print (clicmd)
 os.system(clicmd)
+exit(0)
 clicmd = "ttn-lw-cli end-devices create ogn "+TTN_dev_id+" --name "+TTN_dev_id+" --description TEST_device -c .ttn-lw-cli.yml --dev-eui "+TTN_devEui+" --join-eui "+TTN_appEui+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a" 
 print (clicmd)
 os.system(clicmd)

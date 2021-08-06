@@ -58,7 +58,7 @@ def storedb(curs, data, prt=False):	# store the data on the MySQL DB
 	if len(status) > 254:
 		status=staus[0:254]
 	if prt:
-		print ("S-->", ident, station, otime, status, "<--")
+		print ("--> S", ident, station, otime, status, "<<<")
 					# prepare the SQL command
 	inscmd = "insert into OGNTRKSTATUS values ('%s', '%s', '%s', '%s', '%s')" % (ident, station, otime, status, 'STAT')
 	try:
@@ -83,13 +83,13 @@ print("=====================")
 print("Program Version:", time.ctime(os.path.getmtime(__file__)))
 print("==========================================")
 date = datetime.utcnow()                # get the date
-dte = date.strftime("%y%m%d")           # today's date
+dte  = date.strftime("%y%m%d")          # today's date
 print("\nDate: ", date, "UTC on SERVER:", socket.gethostname(), "Process ID:", os.getpid())
 date = datetime.now()			# local time
 parser = argparse.ArgumentParser(description="OGN Push to the OGN APRS the delayed tracks")
 parser.add_argument('-p',  '--print',     required=False,
                     dest='prt',   action='store', default=False)
-args = parser.parse_args()
+args  = parser.parse_args()
 prt   = args.prt			# print on|off
 
 # --------------------------------------#
@@ -121,7 +121,7 @@ print("MySQL: Database:", DBname, " at Host:", DBhost)
 # --------------------------------------#
 
 count = 0				# counter of received messages
-HOST=""					# localhost
+HOST ="ubuntu"			# localhost
 PORT = 50000              		# Arbitrary non-privileged port
 hostname = socket.gethostname()		# the hostname to send it back to the client
 with open(pidfile, "w") as f:		# set the lock file  as the pid
@@ -164,9 +164,11 @@ try:					# server process receive the TRKSTATUS messages and store it on the DDB
             dd=data.decode('utf-8')	# convert it to an stream
             if prt:
                mm=dd.rstrip(" \n\r")
-               print("D:",  mm , ":<<<")
+               print("<-- D:",  mm , ":<<<")
 					# build the reply msg
-            msg="OK "+str(count)+" "+hostname+' '+programver
+            now = datetime.utcnow()
+
+            msg="OK "+str(count)+" "+hostname+' '+programver+' '+now.isoformat()
             conn.sendall(msg.encode('utf-8')) # send it back to the client
             storedb(curs, dd, prt)	# store on the DDBB
             cond.commit()		# and commit it

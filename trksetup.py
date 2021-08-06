@@ -436,7 +436,7 @@ if found:			# set the last one !!!
 # ------------------------------------------------------------------ #
    if pairing:								# if pairing the OGN TRACKER and a FLARMID ??
       trk=flarmid							# the tracker that we want to pair
-      tflarmid=pairing							# with the flarm device
+      tflarmid=pairing.upper()						# with the flarm device
       localtime = datetime.datetime.now()				# get today's date
       today = localtime.strftime("%y/%m/%d %H:%M:%S")			# in string format yymmdd
       if trk[0:3] != 'OGN' and (tflarmid[0:3] == 'FLR' or tflarmid[0:3] == 'ICA'):
@@ -472,7 +472,7 @@ if found:			# set the last one !!!
          print ("ADD Pairing Error either the OGN tracker "+trk+" or the FlarmID "+tflarmid+" are not registered on the OGN DDB")
          conn.close()
          exit(0)
-      print ("PAIRING ==> ", trk, "with FlarmID", tflarmid, "and owner:", towner, "on DBhost:", config.DBhost, "\n\n")
+      print ("PAIRING ==> ", trk, "with FlarmID", tflarmid, ognreg, cn, model, "and owner:", towner, "on DBhost:", config.DBhost, "\n\n")
    # end of if PAIRING
 
 # ------------------------------------------------------------------ #
