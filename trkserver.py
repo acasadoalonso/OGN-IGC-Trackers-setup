@@ -148,7 +148,11 @@ try:					# server process receive the TRKSTATUS messages and store it on the DDB
     sock=conn
     print ("Waiting for connections:", HOST, PORT)
     with conn:
-        print('Connected by', addr)
+        try:
+             h=gethostbyaddr(addr[0])
+             print ("Connected to:", addr[0], "Host name:", h[0])
+        except:
+             print ("Connected to:", addr[0], " that is an unkown host")
         print("Wait now for login from the OGN station and credentials.\n")
         while True:			# for ever while connected
             now = datetime.utcnow()		# get the UTC time

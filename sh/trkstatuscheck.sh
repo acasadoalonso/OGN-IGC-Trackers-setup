@@ -1,6 +1,9 @@
 #!/bin/bash
 pid=$"/tmp/TRKS.pid"
-pnum=$(pgrep -x -f "python3 /home/angel/src/TRKSsrc/main/trkserver.py -p True")
+SCRIPT=$(readlink -f $0)
+SCRIPTPATH=`dirname $SCRIPT`
+
+pnum=$(pgrep -x -f "python3 $SCRIPTPATH/../trkserver.py -p True")
 if [ $? -eq 0 ]
 then
         logger -t $0 "TRKServer is running..."$pnum
@@ -13,6 +16,6 @@ else
         fi
 
         logger -t $0 "TRKserver is restarting"
-        bash ~/src/TRKSsrc/sh/trkstatus.sh
+        bash $SCRIPTPATH/trkstatus.sh
 fi
 
