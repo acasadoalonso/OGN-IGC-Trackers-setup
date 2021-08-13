@@ -40,8 +40,11 @@ def prttime(unixtime):
 ########################################################################
 def shutdown(cond, prt=False):          # shutdown routine, close files and report on activity
                                         # shutdown before exit
-	cond.commit()
-	cond.close()
+	try:
+		cond.commit()
+		cond.close()
+	except:
+		print ("Errors at shutdown, ignored ...", file=sys.stderr)
 	date = datetime.utcnow()        # get the date
 	print ("Shutdown now:", date)
 	return
@@ -65,10 +68,10 @@ def storedb(curs, data, prt=False):	# store the data on the MySQL DB
 		curs.execute(inscmd)	# store the data on the MySQL DB
 	except MySQLdb.Error as e:
 		try:
-			print(">>>MySQL1 Error [%d]: %s" % ( e.args[0], e.args[1]))
+			print(">>>MySQL1 Error [%d]: %s" % ( e.args[0], e.args[1]), file=sys.stderr)
 		except IndexError:
-			print(">>>MySQL2 Error: %s" % str(e))
-			print(">>>MySQL3 error:",  numtrksta, inscmd)
+			print(">>>MySQL2 Error: %s" % str(e), file=sys.stderr)
+			print(">>>MySQL3 error:",  numtrksta, inscmd, file=sys.stderr)
 			print(">>>MySQL4 data :",  s)
 	return True
 #
@@ -99,7 +102,7 @@ prt   = args.prt			# print on|off
 # --------------------------------------#
 import config                           # get the configuration data
 if os.path.exists(pidfile):		# check if another process running
-    raise RuntimeError("TRKSTATUS already running !!!")
+    raise RuntimeError("TRKSERVER already running !!!")
     exit(-1)
 #
 import locale

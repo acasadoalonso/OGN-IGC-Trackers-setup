@@ -85,6 +85,7 @@ except MySQLdb.Error as e:
         print ("SQL error: ",e)
 trks={}						# the list of trackers and its counters
 trkt={}						# the list of trackers and the last OTIME
+linen=1
 print (html1% (today,nrecs))			# report data and number of pairs
 print (html2)
 print ("<b> <a>TRKDEV  IDTRK     REGTRK CID STATION       UTCTIME            STATUS     SOURCE </a> </b> <br />") 
@@ -125,12 +126,13 @@ for row in curs.fetchall():                     # search
            if status[0] == 'h' and status[3:5] == ' v':
               status = "        "+status
         if qlf in trkt:				# do we have the timestamp
-           continue
+           continue				# if seen already, no nothing just report the newer one
         else:
-           trkt[qlf]=otime			# save the timestamp
+           trkt[qlf]=otime			# save the timestamp ... marked as seen.p
         if action == 'list' and status[8] != 'h':
            continue 
-        print ("<a> TRKDEV: %-9s %-7s %-3s %-9s %-20s %-30s %4s "% (id1, reg, cid, station, str(otime), status, source), "</a>")
+        print ("<a> %3d TRKDEV: %-9s %-7s %-3s %-9s %-20s %-30s %4s "% (linen, id1, reg, cid, station, str(otime), status, source), "</a>")
+        linen += 1
 
 print (html3)					# print the end of HTML table
 conn.close()

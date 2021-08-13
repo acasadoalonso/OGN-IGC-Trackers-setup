@@ -22,11 +22,11 @@ def signal_term_handler(signal, frame):
 signal.signal(signal.SIGTERM, signal_term_handler)
 # ......................................................................#
 parser = argparse.ArgumentParser(
-    description="OGN isend to the management server the OGN tracker status")
+    description="OGN send info to the management server the OGN tracker status")
 parser.add_argument('-p',  '--print',     required=False,
                     dest='prt',   action='store', default=False)
 parser.add_argument('-s',  '--server',     required=False,
-                    dest='server',   action='store', default='repoogn.ddns.net')
+                    dest='server',   action='store', default='acasado.es')
 parser.add_argument('-pt',  '--port',     required=False,
                     dest='port',   action='store', default=50000)
 args = parser.parse_args()
@@ -40,21 +40,31 @@ print("=====================")
 print("Program Version:", ctime(os.path.getmtime(__file__)))
 print("==========================================")
 
+pidfile="/tmp/TRK.pid"
+if os.path.exists(pidfile):             # check if another process running
+    raise RuntimeError("TRKCLIENT already running !!!")
+    exit(-1)
+#
+with open(pidfile, "w") as f:           # set the lock file  as the pid
+    f.write(str(os.getpid()))
+    f.close()
+atexit.register(lambda: os.remove(pidfile))
+
 server="acasado.es"                             # server to send the TRK status messages
 server_ip = socket.gethostbyname(server)
 print("IP addr: ", server_ip, "for:",server)
-hostname = socket.gethostname()                         # get the name of the OGN station
+hostname = socket.gethostname()                 # get the name of the OGN station
 print("\nConnecting with:", server, "on port:", port, "from:", hostname)
 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # create the sock
 errorc = 0
-while errorc < 100:                                     # while not too many errors
+while errorc < 1001:                            # while not too many errors
     try:
         sock.connect((server_ip, port))         # try to connect
         break
     except:
         print("Try to connect ...",errorc)
-        if errorc > 100:
-            print("Error connecting ...")
+        if errorc == 1000:
+            print("Error connecting ... leaving now")
             exit(0)
     sleep(5)
     errorc += 1
@@ -67,7 +77,7 @@ now = datetime.utcnow()
 login = 'L: user '+hostname+' vers '+programver+' '+now.isoformat()# prepare the login message
 if prt:
     print(login)
-login = login.encode(encoding='utf-8', errors='strict')  # convert it to bytes
+login = login.encode(encoding='utf-8', errors='strict') # convert it to bytes
 sock.send(login)                                        # send the login
 data = sock.recv(1024)                                  # receive the reply
 print('--> Received', repr(data))                               # and report it
@@ -106,18 +116,18 @@ while True:                                             # for ever
         continue
     if r[khz+4:khz+6] != '3:':                  # it is for a OGN tracker ???
         continue
-    ident = r[khz+6:khz+12]                             # get the ident
+    ident = r[khz+6:khz+12]                     # get the ident
     rr = r[khz+13:]
     sc = rr.find(':')
     body = rr[sc+2:]
     msg = "M:"+station+':'+ident+':'+body
     if prt:
        print("Mesg:", msg)
-    msg = msg.encode('utf-8')                           # convert to bytes
+    msg = msg.encode('utf-8')                    # convert to bytes
     if station != ':':
         try:
             print("<--", msg)
-            sock.sendall(msg)           # send it to the management server
+            sock.sendall(msg)           	# send it to the management server
         except KeyboardInterrupt:               # if Ctrl-C
             print("Keyboard input received, end of program, shutdown")
             print("Msgs sent:", count)
@@ -127,9 +137,9 @@ while True:                                             # for ever
             print("Msgs sent:", count)
             sock.close()
             exit(0)
-        count += 1
         data = sock.recv(1024)                  # receive the ack
-        #print('--> Received', repr(data), count)
+        count += 1
         print('--> Received', data.decode('UTF-8'), count)  # and report it
     sys.stdout.flush()
+    sys.stderr.flush()
 #########################################################################################################################

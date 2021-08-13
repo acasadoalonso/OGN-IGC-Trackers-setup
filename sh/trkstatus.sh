@@ -8,7 +8,7 @@ date                            		>>trks.log
 python3 ~/src/APRSsrc/main/APRScalsunrisesunset.py >>trks.log
 echo "TRKserver.sh:"	            		>>trks.log
 echo "============:"     	       		>>trks.log
-python3 $SCRIPTPATH/../trkserver.py -p True	>>trks.log 2>>trks.log &
+python3 $SCRIPTPATH/../trkserver.py -p True	>>trks.log 2>>trkserr.log &
 pgrep -a python3				>>trks.log
 date                            		>>trks.log
 cd
