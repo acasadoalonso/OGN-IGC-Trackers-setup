@@ -14,7 +14,8 @@ import atexit
 import MySQLdb                          # the SQL data base routines^M
 import json
 import argparse
-from datetime import datetime, timedelta
+from   datetime import datetime, timedelta
+from   ognddbfuncs import *
 
 #########################################################################
 
@@ -51,7 +52,7 @@ def shutdown(cond, prt=False):          # shutdown routine, close files and repo
 ########################################################################
 def storedb(curs, data, prt=False):	# store the data on the MySQL DB
 	if data[0:2] != 'M:':		# if is is not an status msg, nothing to do
-		return False
+		return ' '
 	otime = datetime.utcnow()	# grab the time
 	sc1=data[2:].find(':')		# parser the message
 	sc2=data[sc1+3:].find(':')
@@ -73,7 +74,7 @@ def storedb(curs, data, prt=False):	# store the data on the MySQL DB
 			print(">>>MySQL2 Error: %s" % str(e), file=sys.stderr)
 			print(">>>MySQL3 error:",  numtrksta, inscmd, file=sys.stderr)
 			print(">>>MySQL4 data :",  s)
-	return True
+	return ident
 #
 ########################################################################
 #
@@ -175,9 +176,11 @@ try:					# server process receive the TRKSTATUS messages and store it on the DDB
 					# build the reply msg
             now = datetime.utcnow()
 
-            msg="OK "+str(count)+" "+hostname+' '+programver+' '+now.isoformat()
+            id1=storedb(curs, dd, prt)  # store on the DDBB
+            reg=getognreg(id1[3:])      # get the registration ID
+            cid=getogncn (id1[3:])      # get the competition number
+            msg="OK "+str(count)+" "+hostname+' '+programver+' '+reg+' '+' '+cid+' '+now.isoformat()
             conn.sendall(msg.encode('utf-8')) # send it back to the client
-            storedb(curs, dd, prt)	# store on the DDBB
             cond.commit()		# and commit it
             if count % 10:
                sys.stdout.flush()
