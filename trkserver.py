@@ -25,9 +25,14 @@ def signal_term_handler(signal, frame):
     shutdown(cond) 			# shutdown orderly
     sys.exit(0)
 
+def timeout_handler(signum, frame):
+        print("Timeout!", file=sys.stderr)
+        raise Exception("end of time")
 
 # ......................................................................#
 signal.signal(signal.SIGTERM, signal_term_handler)
+signal.signal(signal.SIGALRM, timeout_handler)
+
 # ......................................................................#
 
 
@@ -60,7 +65,7 @@ def storedb(curs, data, prt=False):	# store the data on the MySQL DB
 	ident="OGN"+data[sc1+3:sc1+sc2+3]
 	status=otime.strftime("%H%M%S")+'h '+data[sc1+sc2+4:].rstrip('\n\r ')
 	if len(status) > 254:
-		status=staus[0:254]
+		status=status[0:254]
 	if prt:
 		print ("--> S", ident, station, otime, status, "<<<")
 					# prepare the SQL command
@@ -137,20 +142,34 @@ day=now.day
 #########################################################################################
 try:					# server process receive the TRKSTATUS messages and store it on the DDBB
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    print ("Socket created:") 
+    s.settimeout(30.0)			# set the timeout 10 seconds
+    print ("Socket created:", s.gettimeout()," seconds timeout") 
+    signal.alarm(15)		 	# give t 15 seconds to reply
     try:
-       s.bind((HOST, PORT))
-    except:
-       time.sleep(30)
-       s.bind((HOST, PORT))
+        try:
+           s.bind((HOST, PORT))		# try to bind that port
+        except Exception as e:
+           print ("Fail BIND once ...", e, file=sys.stderr)
+           time.sleep(5)
+           s.bind((HOST, PORT))		# try again
+    except Exception as to:
+           print("BIND timeout ... ", to, file=sys.stderr)
+           exit (-1)
+    signal.alarm(0)		 	# reset the alarm
     print ("Socket binded:", HOST, PORT) 
     s.listen(1)
     print ("Socket listening:") 
     socket=s
-    conn, addr = s.accept()
+    s.settimeout(None)			# set the timeout none
+    try:
+       conn, addr = s.accept()
+    except Exception as e:
+       print ("ACCEPT Exception:", e)
+       exit(-3)
     print ("Socket accepted:", addr) 
     sock=conn
     print ("Waiting for connections:", HOST, PORT)
+#                                       --------------------------------------------------------
     with conn:
         try:
              h=gethostbyaddr(addr[0])
