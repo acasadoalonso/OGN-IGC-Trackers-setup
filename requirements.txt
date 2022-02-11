@@ -1,1 +1,7 @@
-# To ensure app dependencies are ported from your virtual environment/host machine into your container, run 'pip freeze > requirements.txt' in the terminal to overwrite this file
+MySQL-python==1.2.5
+psutil==5.9.0
+pycryptodome==3.14.1
+pyserial==3.5
+requests==2.27.1
+rsa==4.8
+ttn==2.1.5

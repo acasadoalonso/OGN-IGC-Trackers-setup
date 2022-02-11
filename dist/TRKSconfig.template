@@ -1,0 +1,15 @@
+; OGN TRKS  Server configuration file
+
+[server]
+pid      =/tmp/aprs.pid
+root     =/var/www/html
+MySQL    =True
+DBhost   =yourhost.com
+DBuser   =youruser
+DBpasswd =yourpasswd
+DBuserread   =youruser
+DBpasswdread =yourpasswd
+DBname   =APRSLOG
+DBpath   =/nfs/OGN/SWdata/
+LogData  =True
+prt=True

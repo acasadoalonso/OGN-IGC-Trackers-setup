@@ -1,6 +1,9 @@
 keyfile
 keyfile.encrypt
+keypubl.PEM
 keypriv.PEM
+Keysfuncs.py
+genkeys.py
 TRKSconfig.ini
 oldtrksetup/
 __pycache__/
@@ -8,7 +11,15 @@ ss*
 testTTN.py
 ECDSAtest/
 .vscode
+.vs/
 helium/
 ttnv3/
 netparams.py
 .ttn-lw-cli.yml
+tmp/
+utils/
+build/
+*.spec
+dodist.sh
+mbedtls/
+python-mbedtls/

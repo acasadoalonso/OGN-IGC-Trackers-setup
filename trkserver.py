@@ -7,12 +7,12 @@ import socket
 import string
 import time
 import sys
+import subprocess
 import os.path
 import psutil
 import signal
 import atexit
 import MySQLdb                          # the SQL data base routines^M
-import json
 import argparse
 from   datetime import datetime, timedelta
 from   ognddbfuncs import *
@@ -22,7 +22,7 @@ from   ognddbfuncs import *
 
 def signal_term_handler(signal, frame):
     print('got SIGTERM ... shutdown orderly')
-    shutdown(cond) 			# shutdown orderly
+    shutdown(cond, conn)		# shutdown orderly
     sys.exit(0)
 
 def timeout_handler(signum, frame):
@@ -44,7 +44,7 @@ def prttime(unixtime):
 
 #
 ########################################################################
-def shutdown(cond, prt=False):          # shutdown routine, close files and report on activity
+def shutdown(cond, conn, prt=False):    # shutdown routine, close files and report on activity
                                         # shutdown before exit
 	try:
 		cond.commit()
@@ -52,6 +52,8 @@ def shutdown(cond, prt=False):          # shutdown routine, close files and repo
 	except:
 		print ("Errors at shutdown, ignored ...", file=sys.stderr)
 	date = datetime.utcnow()        # get the date
+	if conn:
+		conn.close()
 	print ("Shutdown now:", date)
 	return
 ########################################################################
@@ -139,38 +141,42 @@ with open(pidfile, "w") as f:		# set the lock file  as the pid
 atexit.register(lambda: os.remove(pidfile))
 now=datetime.utcnow()
 day=now.day
+conn=None
 #########################################################################################
 try:					# server process receive the TRKSTATUS messages and store it on the DDBB
   with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.settimeout(30.0)			# set the timeout 10 seconds
-    print ("Socket created:", s.gettimeout()," seconds timeout") 
+    print ("Socket created: with", s.gettimeout()," seconds timeout") 
     signal.alarm(15)		 	# give t 15 seconds to reply
     try:
         try:
            s.bind((HOST, PORT))		# try to bind that port
         except Exception as e:
            print ("Fail BIND once ...", e, file=sys.stderr)
-           time.sleep(5)
+           time.sleep(10)
+           s.settimeout(90.0)		# set the timeout 90 seconds
            s.bind((HOST, PORT))		# try again
     except Exception as to:
-           print("BIND timeout ... ", to, file=sys.stderr)
+           print("BIND timeout .....", to, file=sys.stderr)
+           subprocess.run(['lsof', '-i', ':50000'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+           print(subprocess.getoutput("lsof -i :50000"), file=sys.stderr)
            exit (-1)
     signal.alarm(0)		 	# reset the alarm
     print ("Socket binded:", HOST, PORT) 
-    s.listen(1)
+    s.listen(2)				# 2 threads !!!
     print ("Socket listening:") 
-    socket=s
-    s.settimeout(None)			# set the timeout none
+    s.settimeout(None)			# set the timeout none / no timeout
     try:
-       conn, addr = s.accept()
+       conn, addr = s.accept()		# accept connections
     except Exception as e:
        print ("ACCEPT Exception:", e)
        exit(-3)
-    print ("Socket accepted:", addr) 
-    sock=conn
+    print ("Socket accepted:", addr) 	# report the IP and port
     print ("Waiting for connections:", HOST, PORT)
+    sys.stdout.flush()
+    sys.stderr.flush()
 #                                       --------------------------------------------------------
-    with conn:
+    with conn:				# using that connection 
         try:
              h=gethostbyaddr(addr[0])
              print ("Connected to:", addr[0], "Host name:", h[0])
@@ -178,15 +184,16 @@ try:					# server process receive the TRKSTATUS messages and store it on the DDB
              print ("Connected to:", addr[0], " that is an unkown host")
         print("Wait now for login from the OGN station and credentials.\n")
         while True:			# for ever while connected
-            now = datetime.utcnow()		# get the UTC time
+            now = datetime.utcnow()	# get the UTC time
             if now.day != day:	        # check if day has changed
                 print("End of Day...Day: ", day,"\n\n")	# end of UTC day
-                shutdown(cond)		# recycle
-                print("Bye ... :", count,"\n\n\n")	# end of UTC day
+                shutdown(cond, conn)	# recycle
+                print("Bye ... Messages sent:", count,"\n\n\n")	# end of UTC day
                 exit(0)
 
-            data = conn.recv(1024)	# receive the TRKSTATUS message
-            if not data: break		# if cancel the client
+            data = conn.recv(1024)	# receive the TRKSTATUS message from the client
+            if not data: 
+                   break		# if cancel by the client
             count += 1
             dd=data.decode('utf-8')	# convert it to an stream
             if prt:
@@ -203,13 +210,16 @@ try:					# server process receive the TRKSTATUS messages and store it on the DDB
             cond.commit()		# and commit it
             if count % 10:
                sys.stdout.flush()
-        print ("Counter:", count)
+#     -----------------------------------------------------------------------
+    print ("Lost connection. Counter of message sent:", count)
+    sys.stdout.flush()
+    sys.stderr.flush()
 #########################################################################################
 except KeyboardInterrupt:
     print("Keyboard input received, end of program, shutdown")
     pass
 
-shutdown(cond)				# shutdown tasks
-print ("Exit now ...          ", count)
+shutdown(cond, conn)			# shutdown tasks (close DB, ...)
+print ("Exit now ...     Msgs: ", count)
 exit(0)
 

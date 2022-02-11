@@ -1,7 +1,7 @@
 #!/bin/bash
 echo								
 echo " "							
-echo "Installing the SGP 2D live tracking interface ...." 	
+echo "Installing the TRACKER support systems        ...." 	
 echo "=================================================="	
 echo " "							
 echo								
@@ -46,7 +46,9 @@ sudo apt-get install -y php7.3
 sudo apt-get install -y ntpdate					
 sudo apt-get install -y minicom					
 sudo apt-get install -y jq
-sudo apt-get install python3-mysqldb				
+sudo apt-get install -y python3-mysqldb			
+sudo apt-get install -y libmbedtls-dev	
+sudo apt-get install -y python-serial python3-serial
 sudo a2enmod rewrite						
 sudo phpenmod mcrypt						
 sudo phpenmod mbstring						
@@ -56,17 +58,20 @@ sudo -H python3 -m pip install ephem pytz geopy configparser
 sudo -H python3 -m pip install pycountry			
 sudo -H python3 -m pip install beeprint ogn.client		
 sudo -H python3 -m pip install tqdm psutil 			
-sudo -H python3 -m pip install ttn pyserial				
+sudo -H python3 -m pip install ttn pyserial serial				
 sudo -H python3 -m pip install eciespy pycryptodome             
 sudo -H python3 -m pip install python_cayennelpp
-
+sudo -H python3 -m pip install --upgrade google-api-python-client
+sudo -H python3 -m pip install tinyaes
+sudo -H python3 -m pip install --upgrade python-mbedtls
+sudo -H python3 -m pip install pyinstaller pyreqs
 cp TRKSconfig.template TRKSconfig.ini
 update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 update-alternatives --install /usr/bin/python python /usr/bin/python2 1
 python --version
 cd
 export IDF_PATH=~/esp-idf
-git clone -b v4.2 --recursive https://github.com/espressif/esp-idf.git
+git clone -b v4.1 --recursive https://github.com/espressif/esp-idf.git
 cd esp-idf
 ./install.sh
 . ./export.sh
@@ -76,3 +81,4 @@ mkdir src
 cd src
 git clone https://github.com/pjalocha/esp32-ogn-tracker.git
 cd esp32-ogn-tracker
+cd
