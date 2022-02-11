@@ -65,7 +65,7 @@ sudo -H python3 -m pip install --upgrade google-api-python-client
 sudo -H python3 -m pip install tinyaes
 sudo -H python3 -m pip install --upgrade python-mbedtls
 sudo -H python3 -m pip install pyinstaller pyreqs
-cp TRKSconfig.template TRKSconfig.ini
+cp TRKSconfig.ini.template TRKSconfig.ini
 update-alternatives --install /usr/bin/python python /usr/bin/python3 2
 update-alternatives --install /usr/bin/python python /usr/bin/python2 1
 python --version
