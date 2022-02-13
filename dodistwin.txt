@@ -1,0 +1,30 @@
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>cd Z: 
+Z:\Documents\OGN\src\TRKSsrc
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>echo " =============================================================== " 
+" =============================================================== "
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>rm -r build/* 
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>pyinstaller -F --noconfirm --clean --key OGNOGNOGNOGNOGN --name TRKsetup.WIN TRKsetup.py 
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>pyinstaller -F --noconfirm --clean --key OGNOGNOGNOGNOGN --name VALI-AVX.WIN VALI-AVX.py 
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>rm -r build/* 
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>echo " =============================================================== " 
+" =============================================================== "
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>cd Z: 
+Z:\Documents\OGN\src\TRKSsrc
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>echo " =============================================================== " 
+" =============================================================== "
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>pyinstaller -F --noconfirm --clean --key OGNOGNOGNOGNOGN --name TRKsetup.WIN TRKsetup.py 
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>pyinstaller -F --noconfirm --clean --key OGNOGNOGNOGNOGN --name VALI-AVX.WIN VALI-AVX.py 
+
+acasa@ANGEL-XPS13 Z:\Documents\OGN\src\TRKSsrc>echo " =============================================================== " 
+" =============================================================== "

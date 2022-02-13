@@ -1,0 +1,32 @@
+
+#
+# TheThingsNetwork (TTN) parameters
+#
+TTN_app_id     = ""
+TTN_dev_id     = ""
+TTN_appEui     = ""
+TTN_appKey     = ""
+#
+
+#
+# Helium Parameters
+#
+#Parameter Name	        Type	Description
+#name (required)	string	A human-friendly name for the device
+#app_eui (required)	string	LoRaWAN Application EUI
+#app_key (required)	string	LoRaWAN Application Key
+#dev_eui (required)	string	LoRaWAN Device EUI
+#
+HEL_name      = ""
+HEL_dev_eui   = ""
+HEL_DEVID     = ""
+HEL_app_eui   = ""
+HEL_app_key   = ""
+HEL_uuid_label= ""
+HEL_label     = {"label":   HEL_uuid_label}
+HEL_header    = {"key": ""}
+HEL_URL       = "https://console.helium.com/api/v1/devices"
+HEL_LAB_URL   = "https://console.helium.com/api/v1/labels"
+
+#######
+

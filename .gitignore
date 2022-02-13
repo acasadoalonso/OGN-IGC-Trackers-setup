@@ -11,6 +11,8 @@ testTTN.py
 netparams.py
 .ttn-lw-cli.yml
 *.spec
+*.obj
+windist.txt
 dodist.sh
 dodist.bat
 makedist.sh
@@ -29,3 +31,5 @@ build/
 dist/
 mbedtls/
 python-mbedtls/
+VALI-AVX-WIN/x64/
+vali-avx/obj
