@@ -11,7 +11,7 @@ import os
 from configparser import ConfigParser
 configdir = os.getenv('CONFIGDIR')
 
-if configdir == None:
+if configdir == None and os.name != 'nt':
     configdir = '/etc/local/'
 configfile = configdir+'TRKSconfig.ini'
 if os.path.isfile("./TRKSconfig.ini"):

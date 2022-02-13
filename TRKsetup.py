@@ -14,6 +14,7 @@ import os
 import binascii
 import base64
 import requests
+import urllib.parse
 import netparams as net
 from os import path
 
@@ -39,6 +40,24 @@ def getHEL_DEVID(dev_eui):				# return the Helium ID based on the lorawan EUI
            return (dev['id'])				# return tghe Helium ID
     return 0
 
+########
+def gettrkpublickey(ser, prt=False):		# Get the public key from the trackera
+    publickey=""				# public key from tracker
+    cnt=0
+    eol=False
+    while cnt < 16:
+        line = ser.readline()   		# read a '\n' terminated line
+        #print ("LLL:", cnt, line)
+        if len(line) == 0:      		# end of data ???
+           if eol:
+              break				# all done
+           else:
+              eol=True
+              continue
+        l=line.decode('utf-8')
+        publickey += l
+
+    return publickey
 ########
 def printparams(ser, trkcfg, prt=False):	# print the parameters 
 				# ser serial, trkcfg the tracker configuration table possible values
@@ -67,7 +86,7 @@ def printparams(ser, trkcfg, prt=False):	# print the parameters
               ser.write(etx)	# send a Ctrl-C 
               continue
            if line[10:11] == b'/':
-              MAC=line[11:23]
+              MAC=line[11:27]
         if l[0:7] == '/spiffs':	# ignore the spiffs lines
            continue
         if prt:
@@ -129,24 +148,25 @@ REG_URL = "http://acasado.es:60080/registration/V1/?action=REGISTER&token="     
 #REG_URL = "http://localhost:8181/?action=REGISTER&token="                       # the OGN registration source
 
 ########
-def setregdata(mac, reg, devid, uniqueid, publickey, prt=True):         # set the data from the API server
-    date = datetime.datetime.utcnow()       # get the date
-    dte = date.strftime("%Y-%m-%d")         # today's date
+def setregdata(mac, reg, devid, uniqueid, publickey, prt=False):  
+       						# REGISTER the data from the API server
+    date = datetime.datetime.utcnow()       	# get the date
+    dte = date.strftime("%Y-%m-%d")         	# today's date
     nonce = base64.b64encode(dte.encode('utf-8')).decode('ascii')
     url=REG_URL+nonce
     if reg == '':
        url=url+'&registration=NONE'
     else:
-       url=url+'&registration='+reg
-    url=url+'&mac='+mac+'&devid='+devid+'&uniqueid='+uniqueid+'&publickey='+publickey
+       url=url+'&registration='+reg		# build the URL
+    url=url+'&mac='+mac+'&devid='+devid+'&uniqueid='+uniqueid+'&publickey='+urllib.parse.quote(publickey)
     if prt:
        print(url)
-    req = urllib.request.Request(url)
+    req = urllib.request.Request(url)		# the url instacne
     req.add_header("Accept", "application/json")  # it return a JSON string
     req.add_header("Content-Type", "application/hal+json")
-    r = urllib.request.urlopen(req)         # open the url resource
-    js=r.read().decode('UTF-8')
-    j_obj = json.loads(js)                  # convert to JSON
+    r = urllib.request.urlopen(req)         	# open the url resource
+    js=r.read().decode('UTF-8')			# get the response OK | not OK
+    j_obj = json.loads(js)                  	# convert to JSON
     return j_obj 
 
 
@@ -162,16 +182,19 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 #									#
 # ----------------------------------------------------------------------#
 #######
+
+
 print ("\n\nOGN TRKsetup program:\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
-print ("\n\nArgs: -p print ON|OFF, -u USB port, -s setup on|off, -k print the keys on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing")
+print ("\n\nArgs: -p print ON|OFF, -u USB port, -s setup on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing")
 
 #					  report the program version based on file date
 print ("==========================================================================================================================================================================================\n\n")
-if os.name != 'nt':		# just report the version, not valid on NT or bundles from pyinstaller
+if os.name != 'nt':			# just report the version, not valid on NT or bundles from pyinstaller
    bundle_dir = path.abspath(path.dirname(__file__))
    if bundle_dir[0:9] != "/tmp/_MEI":
       print("Program Version:", time.ctime(os.path.getmtime(path.abspath(__file__))))
       print("=========================================")
+# -------------------------------------------------------------------------------------------------------- #
 parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
 parser.add_argument('-p', '--print',       required=False, dest='prt',      action='store', default=False)
 parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0)
@@ -248,9 +271,10 @@ if owner == "False":		# use the OGN DDB to get t5yyhe data
    owner = False
 # -------------------------------------------------------------------------------#
 keyfilename=keyfile		# name of the file containing the encryption keys
-keyfilename='keyfile'		# name of the file containing the encryption keys
-keyfileencrypted='keyfile.encrypt'		# name of the file containing the keys encrypted
+#keyfilename='keyfile'		# name of the file containing the encryption keys
+keyfileencrypted=keyfilename+'.encrypt'		# name of the file containing the keys encrypted
 etx=b'\x03'			# the Control C
+VT=b'\x0B'			# the Control K
 if encr:
    from Keysfuncs import *
    DecKey=[]			# the 4 hex values of the key
@@ -297,6 +321,9 @@ if encr:			# if use encryption
         if i == 3:
           encryptcmd += b'\n'
         i += 1
+else:
+    encryptcmd=b'$POGNS,Encrypt=0'# prepare the encryption keys
+
 
 # -------------------------------------#
 ser 			= serial.Serial()
@@ -329,8 +356,8 @@ if param == False:		# if noot found, nothing else to do
 
 ID=param['TrackerID']		# get the tracker ID
 MAC=param['MAC']		# get the tracker MAC ID
-#publickey=param['PublicKey']	# get the Public Key from the tracker ==> reg DB
-publickey="1234567890ABCDEF1234567890ABCDEF"    # <<<<<<< TEST
+ser.write(VT)			# send a Ctrl-K 
+publickey=gettrkpublickey(ser)
 if not prt:
    print (param)		# if not prints it yet 
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
@@ -491,7 +518,7 @@ if found:			# set the last one !!!
       print ("PAIRING ==> ", trk, "with FlarmID", tflarmid, ognreg, cn, model, "and owner:", towner, "on DBhost:", config.DBhost, "\n\n")
    # end of if PAIRING
 
-# ------------------------------------------------------------------ #
+ #------------------------------------------------------------------ #
 
    if setup:								# if setup is required 
 									# use the $POGNS cmd to set the parameters ...
@@ -517,7 +544,7 @@ if found:			# set the last one !!!
         printparams(ser, trkcfg, False) 				# print the new parameters
 
    if regopt:								# if registration on the registration DB
-        print("PPP", MAC, regist, ID, uniqueid, publickey)
+        #print("PPP", MAC, regist, ID, uniqueid, publickey)
         r=setregdata(MAC, regist, ID, uniqueid, publickey)
         print ("Registration at server: ", r)
 
