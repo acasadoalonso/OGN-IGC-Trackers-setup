@@ -144,7 +144,7 @@ trkcfg=[ "Address", 		# config parameters to scan
          "PilotID"]
 
 #######
-REG_URL = "http://acasado.es:60080/registration/V1/?action=REGISTER&token="      # the OGN registration source
+REG_URL = "http://glidertracking.fai.org/registration/V1/?action=REGISTER&token="      # the OGN registration source
 #REG_URL = "http://localhost:8181/?action=REGISTER&token="                       # the OGN registration source
 
 ########

@@ -1,0 +1,17 @@
+---
+- hosts: FAI
+  tasks:
+
+  - name: Print the address for each host when defined
+    ansible.builtin.debug:
+       msg: System {{ inventory_hostname }} has IP address {{ ansible_default_ipv4.address }}
+    when: ansible_default_ipv4.address is defined
+
+  - name: "clean dist files"
+    ansible.builtin.shell:
+       cmd: "rm -fr TRKsetup* TRKtool* VALI* vali* "
+       chdir: "/var/www/html/dist/V1.0/" 
+    become: true
+
+
+

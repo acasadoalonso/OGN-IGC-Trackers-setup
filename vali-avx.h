@@ -1,4 +1,7 @@
-//#include "mbedtls/md5.h"
+//
+//   VALI-AVX.h                Header for the OGN/IGC tracker validation program
+//
+
 #include "mbedtls/sha256.h"
 #include "mbedtls/rsa.h"
 #include "mbedtls/platform.h"
@@ -10,6 +13,7 @@
 #include "mbedtls/ecp.h"
 #include "mbedtls/pk.h"
 #include "mbedtls/version.h"
+#include "mbedtls/error.h"
 class SHA256
 { public:
    mbedtls_sha256_context Context;
@@ -96,23 +100,55 @@ class IGC_Key
    { size_t SignLen=0;
      int Ret=mbedtls_ecdsa_write_signature(&SignCtx, MBEDTLS_MD_SHA256, Hash, HashLen, Sign, &SignLen, mbedtls_ctr_drbg_random, &CtrDrbgCtx);
      if(Ret!=0) return 0;                                      // return zero if failure
-     return SignLen; }                                         // return the size of the signature
+     return (int) SignLen; 
+   }                                         // return the size of the signature
 
    int Sign_MD5_SHA512(uint8_t *Sign, const uint8_t *Hash, int HashLen)      // sign an MD5/SHA512 Hash
    { size_t SignLen=0;
      int Ret=mbedtls_ecdsa_write_signature(&SignCtx, MBEDTLS_MD_SHA512, Hash, HashLen, Sign, &SignLen, mbedtls_ctr_drbg_random, &CtrDrbgCtx);
      if(Ret!=0) return 0;                                      // return zero if failure
-     return SignLen; }                                         // return the size of the signature
+     return (int) SignLen; 
+   }                                         // return the size of the signature
 
    int Verify_SHA256(unsigned char *Sign, int sig_len, const uint8_t *Hash, int HashLen)      // Verify a signature
      { 
      int Ret=mbedtls_ecdsa_read_signature (&SignCtx, Hash, HashLen, Sign, sig_len);
      return Ret; }                                         // return the size of the signature
 
+   int Verify(unsigned char *Sign, int sig_len, const uint8_t *data, int datalen)      // Verify a signature
+     { 
+     // Get the message digest info structure for SHA2561
+     unsigned char output[32]; 				/* SHA-256 outputs 32 bytes */
+
+     /*mbedtls_md( const mbedtls_md_info_t *md_info, const unsigned char *input, size_t ilen,
+        unsigned char *output );	*/
+     mbedtls_sha256_ret(data, datalen, output, 0);
+     // Now verify the signature for the given hash of the data
+     int Ret = mbedtls_pk_verify(&Key, 
+                           MBEDTLS_MD_SHA256, output, 0,
+                           Sign, sig_len);
+
+     //int Ret=mbedtls_pk_verify( &Key, MBEDTLS_MD_SHA256 , Hash, HashLen, Sign, sig_len); 
+     return Ret;
+     }                                         // return the size of the signature
+
+   int Parse_PublicKey(unsigned char *PublicKey, int key_len)      // 
+     { 
+     mbedtls_pk_init(&Key);
+     int Ret = mbedtls_pk_can_do(&Key, MBEDTLS_PK_ECKEY);
+         {
+         if (Ret != 0)
+            return(-1);
+         }
+     
+     Ret=mbedtls_pk_parse_public_key (&Key, PublicKey, key_len);
+     return Ret; }                                         // return the size of the signature
+
    int Pub_WriteBin(uint8_t *Data, int MaxLen)                 // write the public key in a binary form
    { size_t Len=0;
      if(mbedtls_ecp_point_write_binary(&SignCtx.grp, &SignCtx.Q, MBEDTLS_ECP_PF_UNCOMPRESSED, &Len, Data, MaxLen)!=0) return 0;
-     return Len; }                                             // return number of bytes written
+     return (int) Len; 
+   }                                             // return number of bytes written
 
    int Pub_ReadBin(const uint8_t *Data, int Len)
    { return mbedtls_ecp_point_read_binary(&SignCtx.grp, &SignCtx.Q, Data, Len); } // return zero for success

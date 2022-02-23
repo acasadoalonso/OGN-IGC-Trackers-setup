@@ -13,6 +13,7 @@ netparams.py
 *.spec
 *.obj
 windist.txt
+dodistwin.txt
 dodist.sh
 dodist.bat
 makedist.sh
