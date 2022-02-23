@@ -136,9 +136,8 @@ void error(const char *msg) { perror(msg); exit(0); }
 // -------------------------------------------------------------------- //
 
 char *
-getregdata(char * output, int outlen, const char *reg, const char *mac, int prt)
+getregdata(char * output, int outlen, const char *reg, const char *mac, const char *devid, int prt)
 {
-    const char *devid="12345";
     struct hostent *server;
     struct sockaddr_in serv_addr;
     int received,  message_size;
@@ -175,6 +174,7 @@ getregdata(char * output, int outlen, const char *reg, const char *mac, int prt)
 							// prepare the full URL to get the content of the registration data
     sprintf(message, "GET %s%s&registration=%s&mac=%s&devid=%s&token=%s HTTP/1.0\r\nHost: %s\r\n\r\n",
             path, data, reg, mac, devid, nonce, host);
+    if (prt) printf("URL: %s ", message);
 
 #ifdef _WIN32						// Windows 10 case
     WSADATA wsa;
@@ -438,13 +438,23 @@ int main(int argc, char *argv[])				// the argument is the File Name
      exit(-1);
      }
 
+  char * DEVONFILE   = strstr(Temp, "LOGN")+15;			// the MAC addr
+  if (DEVONFILE == NULL)
+     {
+     printf ("\nNot DEV L record found ...\n");
+     exit(-1);
+     }
+
   char   regonfile[16];						// the reg
-  char maconfile[16];						// the maca
+  char   devonfile[16];						// the device ID
+  char   maconfile[16];						// the maca
   memset(regonfile, 0, sizeof(regonfile));			// clear it
+  memset(devonfile, 0, sizeof(devonfile));			// clear it
   memset(maconfile, 0, sizeof(maconfile));			// clear it
   int reglen = (int) (strchr(REGONFILE, '\n') - REGONFILE);
   int maclen = (int) (strchr(MACONFILE, '\n') - MACONFILE);
-  if (reglen  == 0 || maclen == 0)
+  int devlen = (int) (strchr(DEVONFILE, '\n') - DEVONFILE);
+  if (reglen  == 0 || maclen == 0 || devlen == 0)
      {
      printf ("\nRegistration or MAC not found one the headers ...\n");
      exit(-1);
@@ -452,8 +462,9 @@ int main(int argc, char *argv[])				// the argument is the File Name
 
   memcpy(regonfile,(const void *) REGONFILE, strchr(REGONFILE, '\n') - REGONFILE);
   memcpy(maconfile,(const void *) MACONFILE, strchr(MACONFILE, '\n') - MACONFILE);
+  memcpy(devonfile,(const void *) DEVONFILE, strchr(DEVONFILE, '\n') - DEVONFILE);
   
-  response = getregdata(buf, buflen, regonfile, maconfile, prt);	// get the registration data
+  response = getregdata(buf, buflen, regonfile, maconfile, devonfile, prt);	// get the registration data
 
   if (prt) printf("Response: %d\n=========================\n%s\n========================\n", (int) strlen(response), response);
   if (strstr(response, "invalid token") != NULL)
