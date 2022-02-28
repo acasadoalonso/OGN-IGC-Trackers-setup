@@ -45,6 +45,7 @@ def gettrkpublickey(ser, prt=False):		# Get the public key from the trackera
     publickey=""				# public key from tracker
     cnt=0
     eol=False
+    found=False
     while cnt < 16:
         line = ser.readline()   		# read a '\n' terminated line
         #print ("LLL:", cnt, line)
@@ -54,8 +55,14 @@ def gettrkpublickey(ser, prt=False):		# Get the public key from the trackera
            else:
               eol=True
               continue
+        if not found and line[0:4] != b'----':	# skip the the NON PK lines
+           continue
+        if line[0:10] == b'-----BEGIN':		# starts the PK ???
+           found = True
         l=line.decode('utf-8')
         publickey += l
+        if line[0:8] == b'-----END PUBLIC KEY-----':
+           break				# ignore the after lines
 
     return publickey
 ########
@@ -81,8 +88,8 @@ def printparams(ser, trkcfg, prt=False):	# print the parameters
            continue
         if cnt == 0:		# first line is the ID
            ID=line[0:10]
-           if ID[0:4] != b'1:3:':
-              print("ID>>>:", ID)
+           if ID[0:4] != b'1:3:' and ID[0:4] != b'1:0:': 	# either normal or stealth
+              print("ID>>>:", ID, "<<<")
               ser.write(etx)	# send a Ctrl-C 
               continue
            if line[10:11] == b'/':
@@ -116,6 +123,7 @@ def printparams(ser, trkcfg, prt=False):	# print the parameters
     	print ("Tracker ID:", trackerID, "MAC:", MAC)
     	print ("Parameters:\n", param, "\n")
     return(param)		# return the table with the parameters already parsed
+
 #######
 trkcfg=[ "Address", 		# config parameters to scan
          "AddrType",
@@ -196,17 +204,18 @@ if os.name != 'nt':			# just report the version, not valid on NT or bundles from
       print("=========================================")
 # -------------------------------------------------------------------------------------------------------- #
 parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
-parser.add_argument('-p', '--print',       required=False, dest='prt',      action='store', default=False)
-parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0)
-parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False)
-parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile')
-parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True)
-parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False)
-parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False)
-parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False)
-parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False)
-parser.add_argument('-a', '--pairing',     required=False, dest='pairing',  action='store', default='False')
-parser.add_argument('-w', '--owner',       required=False, dest='owner',    action='store', default='False')
+parser.add_argument('-p', '--print',       required=False, dest='prt',      action='store', default='False', help=' set print ON|OFF')
+parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0,     help='The USB port where the tracker is connected')
+parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False, help='Do the setup of the tracker')
+parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile', help='Name of the file containing the keys')
+parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True,  help='Use the OGN DDB for the setup')
+parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False, help='Setup for the TTN')
+parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False, help='Setup for Helium')
+parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False, help='Set the encryption ON|OFF')
+parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False, help='Register this tracker on the FAI registration site')
+parser.add_argument('-a', '--pairing',     required=False, dest='pairing',  action='store', default='False', help='Pair this tracker with this Flarm')
+parser.add_argument('-w', '--owner',       required=False, dest='owner',    action='store', default='False', help='Name of the owner(optional)')
+parser.add_argument('-st','--stealth',     required=False, dest='stealth',  action='store', default='False', help='Stealth mode, non identified')
 
 args  	= parser.parse_args()
 prt   	= args.prt		# print debugging
@@ -220,7 +229,12 @@ regopt	= args.reg		# register the device
 encr	= args.encr		# Set encryption mode
 pairing	= args.pairing		# Set pairing ONGT & FLARM
 owner	= args.owner		# Ownner of the FLARM to be paired
+stealth	= args.stealth		# stealth mode - random ID and not identified
 
+if prt == "True" or prt == 'ON':	# set stealth mode
+   prt = True
+else:
+   prt = False			
 if ognddb == "False":		# use the OGN DDB to get t5yyhe data
    ognddb = False
 else:
@@ -236,16 +250,21 @@ if helopt == "True":		# register at the helium network
 else:
    helopt = False			
 
-if regopt == "True":		# register the device
+if regopt == "True" or regopt == 'ON':		# register the device
    regopt = True
    ognddb = True		# register froce to use the OGN DDB			
 else:
    regopt = False			
 
-if encr == "True":		# set encryption mode
+if encr == "True" or encr == 'ON':		# set encryption mode
    encr = True
 else:
    encr = False			
+
+if stealth == "True" or stealth == 'ON':	# set stealth mode
+   stealth = True
+else:
+   stealth = False			
 
 if ttnopt and helopt:
    print("ERROR: Both networks TTN & Helium can not be chosen at the same time !!!\n\n")
@@ -269,6 +288,8 @@ else:
 
 if owner == "False":		# use the OGN DDB to get t5yyhe data
    owner = False
+
+
 # -------------------------------------------------------------------------------#
 keyfilename=keyfile		# name of the file containing the encryption keys
 #keyfilename='keyfile'		# name of the file containing the encryption keys
@@ -344,12 +365,14 @@ sleep(2)			# wait a second to give a chance to receive the data
 #--------------------------------------#
 
 try:
-   param=printparams(ser, trkcfg, prt)# get the configuration parameters
+   param=printparams(ser, trkcfg, prt)
+				# get the configuration parameters
 except:
-   ser.write(b'$POGNS,BTname=123456\n')# make no verbose to avoid other messages
+   ser.write(b'$POGNS,BTname=123456\n')# make 
    ser.write(b'$POGNS,BTname=123456\n')# do it again
    ser.write(etx)		# send a Ctrl-C 
-   param=printparams(ser, trkcfg, prt)# get the configuration parameters
+   param=printparams(ser, trkcfg, prt)
+				# get the configuration parameters
 if param == False:		# if noot found, nothing else to do
    os._exit(1)
 #--------------------------------------#
@@ -358,8 +381,9 @@ ID=param['TrackerID']		# get the tracker ID
 MAC=param['MAC']		# get the tracker MAC ID
 ser.write(VT)			# send a Ctrl-K 
 publickey=gettrkpublickey(ser)
-if not prt:
+if prt:
    print (param)		# if not prints it yet 
+else:
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
 if setup and encr:
 	ser.write(encryptcmd)	# Write the encryption keys
@@ -536,8 +560,18 @@ if found:			# set the last one !!!
         ser.write(cmd.encode('UTF-8'))
         cmd="$POGNS,Type="+str(devtype)+"\n"
         ser.write(cmd.encode('UTF-8'))
-        if APP_key != '':
+        if APP_key != '':						# if we have an APP key ??
            cmd="$POGNS,AppKey="+APP_key+"\n"
+           ser.write(cmd.encode('UTF-8'))
+        if stealth:							# if stealth mode requested
+           cmd="$POGNS,AddrType=0\n"
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,Stealth=1\n"
+           ser.write(cmd.encode('UTF-8'))
+        else:
+           cmd="$POGNS,AddrType=3\n"
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,Stealth=0\n"
            ser.write(cmd.encode('UTF-8'))
         ser.write(etx)							# send a Ctrl-C 
         sleep(1)							# wait a second to give a chance to receive the data

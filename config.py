@@ -55,12 +55,12 @@ else:
 # --------------------------------------#
 try:
         prttext     = cfg.get('server', 'prt').strip("'")
-        if     (prttext == 'False'):
-                prt = False
-        else:
+        if      prttext == 'True' or prttext == 'ON':
                 prt = True
+        else:
+                prt = False
 except:
-        prt         = True
+        prt         = False
 
 
 try:
