@@ -128,6 +128,7 @@ def printparams(ser, trkcfg, prt=False):	# print the parameters
 trkcfg=[ "Address", 		# config parameters to scan
          "AddrType",
          "AcftType",
+         "Stealth",
          "Encrypt",
          "EncryptKey[0]",
          "EncryptKey[1]",
@@ -190,7 +191,8 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 #									#
 # ----------------------------------------------------------------------#
 #######
-
+Hard='V1.0'
+Soft='V1.0'
 
 print ("\n\nOGN TRKsetup program:\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
 print ("\n\nArgs: -p print ON|OFF, -u USB port, -s setup on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing")
@@ -204,21 +206,21 @@ if os.name != 'nt':			# just report the version, not valid on NT or bundles from
       print("=========================================")
 # -------------------------------------------------------------------------------------------------------- #
 parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
-parser.add_argument('-p', '--print',       required=False, dest='prt',      action='store', default='False', help=' set print ON|OFF')
-parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0,     help='The USB port where the tracker is connected')
-parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False, help='Do the setup of the tracker')
-parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile', help='Name of the file containing the keys')
-parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True,  help='Use the OGN DDB for the setup')
-parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False, help='Setup for the TTN')
-parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False, help='Setup for Helium')
-parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False, help='Set the encryption ON|OFF')
-parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False, help='Register this tracker on the FAI registration site')
+parser.add_argument('-p', '--print',       required=False, dest='prttxt',   action='store', default='False', help=' set print ON|OFF')
+parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0,       help='The USB port where the tracker is connected')
+parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False,   help='Do the setup of the tracker')
+parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile',help='Name of the file containing the keys')
+parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True,    help='Use the OGN DDB for the setup')
+parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False,   help='Setup for the TTN')
+parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False,   help='Setup for Helium')
+parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False,   help='Set the encryption ON|OFF')
+parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False,   help='Register this tracker on the FAI registration site')
 parser.add_argument('-a', '--pairing',     required=False, dest='pairing',  action='store', default='False', help='Pair this tracker with this Flarm')
 parser.add_argument('-w', '--owner',       required=False, dest='owner',    action='store', default='False', help='Name of the owner(optional)')
 parser.add_argument('-st','--stealth',     required=False, dest='stealth',  action='store', default='False', help='Stealth mode, non identified')
 
 args  	= parser.parse_args()
-prt   	= args.prt		# print debugging
+prttxt 	= args.prttxt		# print debugging
 setup 	= args.setup		# setup the tracker
 usb   	= args.usb		# USB port where the tracker is connected	
 keyfile	= args.keyfile		# file containing the encryption keys	
@@ -231,10 +233,10 @@ pairing	= args.pairing		# Set pairing ONGT & FLARM
 owner	= args.owner		# Ownner of the FLARM to be paired
 stealth	= args.stealth		# stealth mode - random ID and not identified
 
-if prt == "True" or prt == 'ON':	# set stealth mode
+if prttxt == "True" or prttxt == 'TRUE' or prttxt == 'ON': # set print mode
    prt = True
 else:
-   prt = False			
+   prt = False			# may be changed by the config profile
 if ognddb == "False":		# use the OGN DDB to get t5yyhe data
    ognddb = False
 else:
@@ -290,19 +292,18 @@ if owner == "False":		# use the OGN DDB to get t5yyhe data
    owner = False
 
 
-# -------------------------------------------------------------------------------#
-keyfilename=keyfile		# name of the file containing the encryption keys
-#keyfilename='keyfile'		# name of the file containing the encryption keys
-keyfileencrypted=keyfilename+'.encrypt'		# name of the file containing the keys encrypted
 etx=b'\x03'			# the Control C
 VT=b'\x0B'			# the Control K
+# -------------------------------------------------------------------------------#
+				# deal with the encryption set the DecKey array
 if encr:
+   keyfilename=keyfile		# name of the file containing the encryption keys
+   keyfileencrypted=keyfilename+'.encrypt'		# name of the file containing the keys encrypted
    from Keysfuncs import *
    DecKey=[]			# the 4 hex values of the key
    privkey = getprivatekey('keypriv.PEM')
    key=getkeyfromencryptedfile(keyfileencrypted, privkey)
    #print ("Key back from file:     ", key)
-
    #key=getkeyfile(keyfilename)	# get the key from the keyfile
    DecKey=getkeys(DecKey, key)	# get the keys 4 words
    #print ("Keys:",DecKey)
@@ -325,10 +326,15 @@ else:
    print("Using OGN DDB database \n")
 
 # --------------------------------------#
-if usb == '-1':
+if prttxt == "True" or prttxt == 'TRUE' or prttxt == 'ON': # set print mode
+   prt = True			# the command takes precedence over the config profile
+
+if usb == '-1':			# just a quick exit
         os._exit(0)
 
-				# set the parameters 
+# -------------------------------------------------------------------------------------------- #
+
+				# set the $POGNS commands 
 i=0
 if encr:			# if use encryption
 				# just prepare the encryption comd
@@ -367,28 +373,31 @@ sleep(2)			# wait a second to give a chance to receive the data
 try:
    param=printparams(ser, trkcfg, prt)
 				# get the configuration parameters
-except:
+except:				# just in case try again !!!
    ser.write(b'$POGNS,BTname=123456\n')# make 
    ser.write(b'$POGNS,BTname=123456\n')# do it again
    ser.write(etx)		# send a Ctrl-C 
    param=printparams(ser, trkcfg, prt)
 				# get the configuration parameters
-if param == False:		# if noot found, nothing else to do
+if param == False:		# if not found, nothing else to do
+   print("Parameters from the trackers not found ... nothing else to do !!!!\n")
    os._exit(1)
 #--------------------------------------#
 
 ID=param['TrackerID']		# get the tracker ID
 MAC=param['MAC']		# get the tracker MAC ID
 ser.write(VT)			# send a Ctrl-K 
-publickey=gettrkpublickey(ser)
+publickey=gettrkpublickey(ser)	# get the public key
+
 if prt:
    print (param)		# if not prints it yet 
 else:
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
+
 if setup and encr:
 	ser.write(encryptcmd)	# Write the encryption keys
 	ser.write("$POGNS,Encrypt=1".encode('utf-8')) 
-if setup and not encr:
+if setup and not encr:		# erase the encrypted mode
 	ser.write("$POGNS,Encrypt=0".encode('utf-8')) 
 
 sleep(2)			# wait a second to give a chance to receive the data
@@ -433,6 +442,7 @@ else:				# deprecated code
         compid 	= rowg[4]  	# competition ID
         model  	= rowg[5]  	# model
         devtype = 1		# always glider
+        uniqueid= 1
         info    = {'device_id': ogntid, 'device_aprsid':flarmid, 'device_type' : 1, 'registration': regist, 'pilot' : pilot, 'cn': compid, 'aircraft_model' : model}
         print ("From DB:", ogntid, flarmid, regist, pilot, compid, model) # whatch out for multiples Ids !!!!
         print (info)
@@ -500,7 +510,9 @@ if found:			# set the last one !!!
       print("Device:   ", net.HEL_DEVID,  " with APPeui:", net.HEL_app_eui, "DEVeui:", net.HEL_dev_eui, "DEVaddr:", net.HEL_dev_eui, "APPkey:", net.HEL_app_key, "Name: ", net.HEL_name, "\n\n")    
       APP_key=net.HEL_app_key						# for the $POGNS
    # end of if helopt
+
 # ------------------------------------------------------------------ #
+
    if pairing:								# if pairing the OGN TRACKER and a FLARMID ??
       trk=flarmid							# the tracker that we want to pair
       tflarmid=pairing.upper()						# with the flarm device
@@ -546,19 +558,25 @@ if found:			# set the last one !!!
 
    if setup:								# if setup is required 
 									# use the $POGNS cmd to set the parameters ...
-        cmd="$POGNS,Reg="+regist+"\n"
+        cmd="$POGNS,Reg="+regist+"\n"					# Registration ID
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,Pilot="+pilot+"\n"
+        cmd="$POGNS,Pilot="+pilot+"\n"					# pilot name
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,ID="+compid+"\n"
+        cmd="$POGNS,ID="+compid+"\n"					# competition ID
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,Model="+model+"\n"
+        cmd="$POGNS,Model="+model+"\n"					# aircraft model
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,SN="+flarmid+"\n"
+        cmd="$POGNS,SN="+flarmid+"\n"					# serial number
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,BTname="+flarmid+"\n"
+        cmd="$POGNS,BTname="+flarmid+"\n"				# Bluetooth ID
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,Type="+str(devtype)+"\n"
+        cmd="$POGNS,Type="+str(devtype)+"\n"				# device type
+        ser.write(cmd.encode('UTF-8'))
+        cmd="$POGNS,PilotID="+str(uniqueid)+"\n"			# 
+        ser.write(cmd.encode('UTF-8'))
+        cmd="$POGNS,Hard="+Hard+"\n"					# Hardware version 
+        ser.write(cmd.encode('UTF-8'))
+        cmd="$POGNS,Soft="+Soft+"\n"					# Hardware version 
         ser.write(cmd.encode('UTF-8'))
         if APP_key != '':						# if we have an APP key ??
            cmd="$POGNS,AppKey="+APP_key+"\n"
@@ -568,10 +586,22 @@ if found:			# set the last one !!!
            ser.write(cmd.encode('UTF-8'))
            cmd="$POGNS,Stealth=1\n"
            ser.write(cmd.encode('UTF-8'))
-        else:
-           cmd="$POGNS,AddrType=3\n"
+           cmd="$POGNS,Reg=\n"						# and erase all the data that could identify the tracker
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,Stealth=0\n"
+           cmd="$POGNS,Pilot=\n"
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,ID=\n"
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,Model=\n"
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,SN=\n"
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,PilotID=\n"					# 
+           ser.write(cmd.encode('UTF-8'))
+        else:
+           cmd="$POGNS,AddrType=3\n"					# back to be a std tracker
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,Stealth=0\n"					# no stealth 
            ser.write(cmd.encode('UTF-8'))
         ser.write(etx)							# send a Ctrl-C 
         sleep(1)							# wait a second to give a chance to receive the data
