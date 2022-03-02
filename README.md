@@ -47,9 +47,9 @@ cp TRKSconfig.ini.template TRKSconfig.ini      and review the settings
 
 ./TRKsetup.Linuxarmv7l -h                      	# check that works 
 
-	# the name of the program is TRKsetup.xxxyyy where xxx iis the opsys and yyy is the architecture of the server 
+	# the name of the program is TRKsetup.xxxyyy where xxx is the opsys and yyy is the architecture of the server 
 
-./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setup with registration of the FAI server
+./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setup with registration on the FAI server
 
 
 =======================================================================================================
@@ -58,7 +58,7 @@ OGN TRKsetup program:
 ==========================
 The main utility is the trksetup.py:
 
-Invokation   python3  TRKsetup -h      or     ./TRKsetup.py -h   for the PYTHON version
+Invokation:   python3  TRKsetup -h      or     ./TRKsetup.py -h   # for the PYTHON version
 
              ./TRKsetup.xxxyyy			# where xxx is the opsys and yyy is the architecture ARM32/ARM64/AMD64/WIN
              
