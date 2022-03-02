@@ -56,9 +56,11 @@ The tracker must be connected to the USB port.
 
 Args: -p print ON|OFF, -u USB port, -s setup on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing
 
+TRKsetup program
+================
 
 Program Version: Tue Mar  1 17:28:13 2022
-=========================================
+
 usage: TRKsetup.py [-h] [-p PRTTXT] [-u USB] [-s SETUP] [-kf KEYFILE] [-o OGNDDB] [-t TTN] [-m HELIUM] [-n ENCR] [-r REG] [-a PAIRING] [-w OWNER] [-st STEALTH]
 
 Manage the OGN TRACKERS setup parameters
