@@ -21,22 +21,34 @@ Also you can use the ARM64 version or do it in a UBUNTU64 version
 Once that the RPi is install it do the following commands:
 
 ssh pi@TRKsetup.local 
+
 mkdir OGN
+
 cd    OGN
+
 wget glidertracking.fai.org/dist/V1.0/TRKtools.tgz
+
 wget glidertracking.fai.org/dist/V1.0/esp32-ogn-tracker-bin.tgz
+
 tar xvfz  esp32-ogn-tracker-bin.tgz
+
 Connect the tracker with the USB cable to one of the 4 USB ports of the RPi
+
 type command:   dmesg       and check on which port the tracker has been connected, normally ttyUSB0, if not update the flash_USB0 script.
+
 bash flash_USB0.sh
 
 
 tar xvzf TRKtools.tgz
+
 cd dist
+
 cp TRKSconfig.ini.template TRKSconfig.ini      and review the settings 
 
 ./TRKsetup.Linuxarmv7l -h                      	# check that works 
+
 						# the name of the program is TRKsetup.xxxx where xxxx is the architecture of the server 
+
 ./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setupt with registration of the FAI server
 
 
