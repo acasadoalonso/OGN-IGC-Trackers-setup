@@ -3,47 +3,121 @@ OGN/IGC Trackers setup utilities
 
 This is a set of utilities to do the setup of OGN/IGC tracker for WGC.
 
-The main utility is the trksetup.py
-Invokation   python3 trksetup -h      or     ./trksetup.py -h
+INSTALL
+=======
+
+Get a fresh installion of a RaspberryP,    https://www.raspberrypi.com/software/
+Raspberry Pi OS Lite
+Release date: January 28th 2022
+System: 32-bit
+Kernel version: 5.10
+Debian version: 11 (bullseye)
+Size: 482MB
+
+we suggest to call the server as TRKsetup, user pi, password OGNOGN   but any choice will work.
+Also you can use the ARM64 version or do it in a UBUNTU64 version
+
+Once that the RPi is install it do the following commands:
+
+ssh pi@TRKsetup.local 
+mkdir OGN
+cd    OGN
+wget glidertracking.fai.org/dist/V1.0/TRKtools.tgz
+wget glidertracking.fai.org/dist/V1.0/esp32-ogn-tracker-bin.tgz
+tar xvfz  esp32-ogn-tracker-bin.tgz
+Connect the tracker with the USB cable to one of the 4 USB ports of the RPi
+type command:   dmesg       and check on which port the tracker has been connected, normally ttyUSB0, if not update the flash_USB0 script.
+bash flash_USB0.sh
 
 
+tar xvzf TRKtools.tgz
+cd dist
+cp TRKSconfig.ini.template TRKSconfig.ini      and review the settings 
 
-OGN tracker setup program:
-It gets the information from the tracker firmware and hendles the setup parameter.
-The tracker mus be connected to the USB port.
-==================================================================================
+./TRKsetup.Linuxarmv7l -h                      	# check that works 
+						# the name of the program is TRKsetup.xxxx where xxxx is the architecture of the server 
+./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setupt with registration of the FAI server
 
 
-Hostname:             CASADOUBUNTU  and config file:  ./TRKSconfig.ini 14475
-Config server values: MySQL = True CASADOUBUNTU ogn APRSLOG /nfs/OGN/SWdata/
-usage: trksetup.py [-h] [-p PRT] [-u USB] [-s SETUP] [-k KEYS] [-kf KEYFILE]
-                   [-o OGNDDB] [-t TTN] [-n NOENCR]
+=======================================================================================================
 
-OGN manage the OGN TRACKERS setup parameters
+The main utility is the trksetup.py:
+
+Invokation   python3  TRKsetup -h      or     ./TRKsetup.py -h   for the PYTHON version
+             ./TRKsetup.xxxyyy			# where xxx is the opsys and yyy is the architecture ARM32/ARM64/AMD64
+             
+
+OGN TRKsetup program:
+==========================
+It gets the information from the tracker firmware and handles the setup parameter.
+The tracker must be connected to the USB port.
+
+
+Args: -p print ON|OFF, -u USB port, -s setup on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing
+==========================================================================================================================================================================================
+
+
+Program Version: Tue Mar  1 17:28:13 2022
+=========================================
+usage: TRKsetup.py [-h] [-p PRTTXT] [-u USB] [-s SETUP] [-kf KEYFILE] [-o OGNDDB] [-t TTN] [-m HELIUM] [-n ENCR] [-r REG] [-a PAIRING] [-w OWNER] [-st STEALTH]
+
+Manage the OGN TRACKERS setup parameters
 
 optional arguments:
   -h, --help            show this help message and exit
-  -p PRT, --print PRT
-  -u USB, --usb USB
+  -p PRTTXT, --print PRTTXT
+                        set print ON|OFF
+  -u USB, --usb USB     The USB port where the tracker is connected
   -s SETUP, --setup SETUP
-  -k KEYS, --printkeys KEYS
+                        Do the setup of the tracker
   -kf KEYFILE, --keyfile KEYFILE
+                        Name of the file containing the keys
   -o OGNDDB, --ognddb OGNDDB
-  -t TTN, --ttn TTN
-  -n NOENCR, --noencrypt NOENCR
+                        Use the OGN DDB for the setup
+  -t TTN, --ttn TTN     Setup for the TTN
+  -m HELIUM, --helium HELIUM
+                        Setup for Helium
+  -n ENCR, --encrypt ENCR
+                        Set the encryption ON|OFF
+  -r REG, --register REG
+                        Register this tracker on the FAI registration site
+  -a PAIRING, --pairing PAIRING
+                        Pair this tracker with this Flarm
+  -w OWNER, --owner OWNER
+                        Name of the owner(optional)
+  -st STEALTH, --stealth STEALTH
+                        Stealth mode, non identified
+
+============================================================================================================================================================================================
+
+The validation program.
+This program is used to validate and .IGC file generataed by the OGN/IGC Tracker.
 
 
-the optional parameters are:
+Invokation:
+	python3 VALI-AVX.py				# for the PYTHON versions or
+	./VALI-AVX.xxxyyy				# where xxx is the opsys and yyy is the architecture
 
--p or --print 		for display on stdout the results
--u or --usb USB0	Indicate the USB port, the default is USB0
--s or --setup True	To indicate to do the setup of the new parameters
--k or --keys True	To get the encryption keys
--kf or --keyfile nnn	It is the name of the file containing the keys
--o or --ognddn True	To use the OGN DDB as the base for geting the information about the tracker
--t or --ttn True	To do the setup on the LoRaWan network thethingsnetwork.org 
--n or --noencr		To indicate that no encrytion is needed
+Start VALI-AVX  V1.0
+=====================
+Program Version: Mon Feb 28 14:02:51 2022
+=========================================
+MBEDTS version: mbed TLS 2.16.11
 
+Date:  2022-03-01 17:12:33.659588 UTC on SERVER: CasadoUbuntu Process ID: 134143 posix
+usage: VALI-AVX.py [-h] [-p PRTTXT] [-s STRONGVALTXT] [-u USB] filename
 
+VALI-AVX validate the signature of the .IGC file generated by the OGN/IGC Tracker
 
+positional arguments:
+  filename
 
+optional arguments:
+  -h, --help            show this help message and exit
+  -p PRTTXT, --print PRTTXT
+                        Print ON|OFF
+  -s STRONGVALTXT, --strongval STRONGVALTXT
+                        In case of needed strong validation
+  -u USB, --usb USB     With strong validation the USB port where the tracker is connected
+
+============================================================================================================================================================================================

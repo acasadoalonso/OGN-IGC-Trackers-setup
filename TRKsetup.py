@@ -142,6 +142,8 @@ trkcfg=[ "Address", 		# config parameters to scan
          "Manuf",
          "Model",
          "Type",
+         "Hard",
+         "Soft",
          "SN",
          "ID",
          "Reg",
@@ -191,10 +193,10 @@ signal.signal(signal.SIGTERM, signal_term_handler)
 #									#
 # ----------------------------------------------------------------------#
 #######
-Hard='V1.0'
-Soft='V1.0'
+Hard='AVX-1.0'
+Soft='OGN-1.0'
 
-print ("\n\nOGN TRKsetup program:\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
+print ("\n\nOGN TRKsetup program:\nVersion: "+Soft+"\n==========================\nIt gets the information from the tracker firmware and handles the setup parameter.\nThe tracker must be connected to the USB port.")
 print ("\n\nArgs: -p print ON|OFF, -u USB port, -s setup on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing")
 
 #					  report the program version based on file date
@@ -389,9 +391,7 @@ MAC=param['MAC']		# get the tracker MAC ID
 ser.write(VT)			# send a Ctrl-K 
 publickey=gettrkpublickey(ser)	# get the public key
 
-if prt:
-   print (param)		# if not prints it yet 
-else:
+if not prt:
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
 
 if setup and encr:
@@ -455,6 +455,7 @@ else:				# deprecated code
 print( "==============================================================================================\n\n")
 
 if found:			# set the last one !!!
+
    APP_key=net.TTN_App_Key	# for the $POGNS cmd
    if ttnopt and not helopt:	# if TTN registration
       print ("TheThingsNetwork (TTN) network activity...")
