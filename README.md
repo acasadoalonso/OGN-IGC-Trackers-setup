@@ -47,21 +47,22 @@ cp TRKSconfig.ini.template TRKSconfig.ini      and review the settings
 
 ./TRKsetup.Linuxarmv7l -h                      	# check that works 
 
-	# the name of the program is TRKsetup.xxxx where xxxx is the architecture of the server 
+	# the name of the program is TRKsetup.xxxyyy where xxx iis the opsys and yyy is the architecture of the server 
 
 ./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setup with registration of the FAI server
 
 
 =======================================================================================================
 
+OGN TRKsetup program:
+==========================
 The main utility is the trksetup.py:
 
 Invokation   python3  TRKsetup -h      or     ./TRKsetup.py -h   for the PYTHON version
-             ./TRKsetup.xxxyyy			# where xxx is the opsys and yyy is the architecture ARM32/ARM64/AMD64
+
+             ./TRKsetup.xxxyyy			# where xxx is the opsys and yyy is the architecture ARM32/ARM64/AMD64/WIN
              
 
-OGN TRKsetup program:
-==========================
 It gets the information from the tracker firmware and handles the setup parameter.
 The tracker must be connected to the USB port.
 
@@ -113,6 +114,7 @@ This program is used to validate and .IGC file generataed by the OGN/IGC Tracker
 
 Invokation:
 	python3 VALI-AVX.py				# for the PYTHON versions or
+
 	./VALI-AVX.xxxyyy				# where xxx is the opsys and yyy is the architecture
 
 Start VALI-AVX  V1.0
