@@ -47,9 +47,9 @@ cp TRKSconfig.ini.template TRKSconfig.ini      and review the settings
 
 ./TRKsetup.Linuxarmv7l -h                      	# check that works 
 
-						# the name of the program is TRKsetup.xxxx where xxxx is the architecture of the server 
+	# the name of the program is TRKsetup.xxxx where xxxx is the architecture of the server 
 
-./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setupt with registration of the FAI server
+./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setup with registration of the FAI server
 
 
 =======================================================================================================
