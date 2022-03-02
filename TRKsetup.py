@@ -414,7 +414,7 @@ if ognddb:			# if using the OGN DDB
         pass			# nothing to do
    else:
         if prt:
-           print ("INFO==>: ", info, "<== ")
+           print ("INFO from OGN DDB==>: ", info, "<== ")
         ogntid 	= info['device_id']	# OGN tracker ID
         if 'device_aprsid' in info:
             flarmid = info['device_aprsid']	# Flarmid id to be linked
@@ -426,9 +426,10 @@ if ognddb:			# if using the OGN DDB
         compid 	= info['cn']  		# competition ID
         model  	= info['aircraft_model']  	# model
         uniqueid= info['uniqueid']	# unique id
-        print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model, uniqueid) 
+        if not prt:
+           print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model, uniqueid) 
         found=True
-else:				# deprecated code
+else:				# deprecated code (used for testing and debugging)
 
    curs = conn.cursor()         # set the cursor for searching the devices
                                 # get all the devices with OGN tracker
