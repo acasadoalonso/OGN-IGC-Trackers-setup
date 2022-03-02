@@ -28,6 +28,7 @@ dist/VALI-AVX.$(UNAME_S)$(UNAME_M): 	VALI-AVX.py
 		@echo " "
 		pyinstaller -F --noconfirm --clean --key OGNOGNOGNOGNOGN --name VALI-AVX.$(UNAME_S)$(UNAME_M) VALI-AVX.py
 		cd $(SRC) && rm -rf build/* 
+
 vali-avx:	vali-avx.cc *.h
 		g++ -Wall -O2 vali-avx.cc   -lmbedcrypto -lmbedx509 -lmbedtls -o dist/vali-avx.$(UNAME_S)$(UNAME_M).exe
 
@@ -37,12 +38,15 @@ dist/vali-avx.obj:  	vali-avx.cc *.h
 tarbal:		dist/TRKtools.tgz	
 
 dist/TRKtools.tgz: *.py *.cc *.h 		
+
+		cd $(SRC) && rm -rf build/*
+		rm *.spec 
 		@echo "==============================================================="
-		@echo ">>> create the tarball TRKTOOLS.tgz <<<"
+		@echo ">>>         create the tarball TRKTOOLS.tgz <<<                "
 		@echo "==============================================================="
 		tar cvzf TRKtools.tgz --exclude='*tgz' dist/*
 		mv       TRKtools.tgz dist
-		@echo "========================"
+		@echo "==================== tarbal done =============================="
 
 firmware:	dist/esp32-ogn-tracker-bin.tgz
 
