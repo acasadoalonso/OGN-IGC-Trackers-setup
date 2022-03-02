@@ -6,7 +6,8 @@ This is a set of utilities to do the setup of OGN/IGC tracker for WGC.
 INSTALL
 =======
 
-Get a fresh installion of a RaspberryP,    https://www.raspberrypi.com/software/
+Get a fresh installion of a RaspberryPi,    https://www.raspberrypi.com/software/
+
 Raspberry Pi OS Lite
 Release date: January 28th 2022
 System: 32-bit
@@ -54,7 +55,6 @@ The tracker must be connected to the USB port.
 
 
 Args: -p print ON|OFF, -u USB port, -s setup on|off, -kf keyfile name, -o Use the OGNDDB, -t register on the TTN network, -n encrypt on|off, -r register on the registration DB, --pairing FLARMID pairing with this Flarm, --owner for pairing
-==========================================================================================================================================================================================
 
 
 Program Version: Tue Mar  1 17:28:13 2022
@@ -90,7 +90,10 @@ optional arguments:
 
 ============================================================================================================================================================================================
 
-The validation program.
+
+The validation programi (VALI-AVX).
+===================================
+
 This program is used to validate and .IGC file generataed by the OGN/IGC Tracker.
 
 
@@ -101,7 +104,7 @@ Invokation:
 Start VALI-AVX  V1.0
 =====================
 Program Version: Mon Feb 28 14:02:51 2022
-=========================================
+
 MBEDTS version: mbed TLS 2.16.11
 
 Date:  2022-03-01 17:12:33.659588 UTC on SERVER: CasadoUbuntu Process ID: 134143 posix
