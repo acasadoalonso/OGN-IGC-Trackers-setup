@@ -6,19 +6,25 @@ This is a set of utilities to do the setup of OGN/IGC tracker for WGC.
 INSTALL
 =======
 
-Get a fresh installion of a RaspberryPi,    https://www.raspberrypi.com/software/
+Get a fresh installation of a RaspberryPi,    https://www.raspberrypi.com/software/
 
 Raspberry Pi OS Lite
+
 Release date: January 28th 2022
+
 System: 32-bit
+
 Kernel version: 5.10
+
 Debian version: 11 (bullseye)
+
 Size: 482MB
+
 
 we suggest to call the server as TRKsetup, user pi, password OGNOGN   but any choice will work.
 Also you can use the ARM64 version or do it in a UBUNTU64 version
 
-Once that the RPi is install it do the following commands:
+Once that the RPi is installed it do the following LINUX commands:
 
 ssh pi@TRKsetup.local 
 
@@ -34,7 +40,11 @@ tar xvfz  esp32-ogn-tracker-bin.tgz
 
 Connect the tracker with the USB cable to one of the 4 USB ports of the RPi
 
-type command:   dmesg       and check on which port the tracker has been connected, normally ttyUSB0, if not update the flash_USB0 script.
+type command:
+
+   dmesg 
+
+and check on which port the tracker has been connected, normally ttyUSB0, if not update the flash_USB0 script.
 
 bash flash_USB0.sh
 
