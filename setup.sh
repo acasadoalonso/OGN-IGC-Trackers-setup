@@ -12,6 +12,18 @@
 # -r REG, --register REG
 # -g PAIR --pairing PAIRING
 # -w owner --owner OWNER
+sleep 5 &
+pid=$!
+frames="/ | \\ -"
+while kill -0 $pid 2&>1 > /dev/null;
+do
+    for frame in $frames;
+    do
+        printf "\r$frame Connecting to the tracker..." 
+        sleep 0.5
+    done
+done
+printf "\n"
 if [ $# == 2 ]
 then
    python3 TRKsetup.py --print True --setup True --ognddb True --encrypt False --ttn False --pairing $1 --owner $2
@@ -21,3 +33,5 @@ then
 else
    python3 TRKsetup.py --print True --setup True --ognddb True --encrypt False --ttn False 
 fi
+notify-send "setup.sh" " the TRACKER setup was completed successfully"
+

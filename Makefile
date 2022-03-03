@@ -31,9 +31,11 @@ dist/VALI-AVX.$(UNAME_S)$(UNAME_M): 	VALI-AVX.py
 
 vali-avx:	vali-avx.cc *.h
 		g++ -Wall -O2 vali-avx.cc   -lmbedcrypto -lmbedx509 -lmbedtls -o dist/vali-avx.$(UNAME_S)$(UNAME_M).exe
+		touch dist/vali-avx.$(UNAME_S)$(UNAME_M).exe
 
 dist/vali-avx.obj:  	vali-avx.cc *.h
 		x86_64-w64-mingw32-g++-win32 -Wall -Wno-misleading-indentation -O2 -Imbedtls/include -lmbedtls/visualc/VS2010/x64/Release/mbedTLS.lib -static -c -o dist/vali-avx.obj vali-avx.cc 
+		touch dist/vali-avx.obj
 
 tarbal:		dist/TRKtools.tgz	
 
@@ -61,7 +63,7 @@ dist/esp32-ogn-tracker-bin.tgz:	$(TRACKERSRC)/build/esp32-ogn-tracker.elf
 clean:		cleanlocal cleanfai
 
 cleanlocal:
-		rm -rf dist/TRKsetup* dist/VALI* dist/TRKtools* dist/vali* *.spec build/ dist/build/ dist/*.tgz dist/*template dist/README.md
+		rm -rf dist/TRKsetup* dist/VALI-AVX.Linux* dist/VALI-AVX.WIN* dist/VALI-AVX dist/TRKtools* dist/vali* *.spec build/ dist/build/ dist/*.tgz dist/*template dist/README.md
 cleanfai:
 		ansible-playbook distclean.yml
 

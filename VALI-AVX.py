@@ -259,9 +259,9 @@ PGMhash256=hashlib.sha256(message).hexdigest().upper()
 #print ("HHH", message, PGMhash256)
 
 if PGMhash256 == grecsha:      	# compare the values between the message disgest and the G record 
-   print ("SHA256 Signature OK")
+   print ("SHA256 MD OK")
 else:
-   print ("SHA256 Signature wrong")
+   print ("SHA256 MD wrong")
    sys.stdout.flush()
    os._exit(-1)
 
@@ -352,7 +352,7 @@ if debug:
    print("PEM key lenght:", len(PublicKey), "Key size PEM:", trk.key_size, "Message length:", len(message))
 # 					# checkif valid or not
 if(trk.verify(message, TRKsignbin, digestmod='sha256')):
-    print("Authentic trk & PEM\n")
+    print("Authentic MD signature ... \n")
     rc=0				# IGC valid
 else:
     print(">>> NOT Authentic trk ------------------------------")
