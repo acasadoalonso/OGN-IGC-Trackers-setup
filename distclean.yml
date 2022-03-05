@@ -7,10 +7,11 @@
        msg: System {{ inventory_hostname }} has IP address {{ ansible_default_ipv4.address }}
     when: ansible_default_ipv4.address is defined
 
-  - name: "clean dist files"
+  - name: "Clean the dist files"
     ansible.builtin.shell:
-       cmd: "rm -fr TRKsetup* TRKtool* VALI* vali* "
+       cmd: "rm -fr TRKsetup* TRKtool* VALI* vali* esp32* "
        chdir: "/var/www/html/dist/V1.0/" 
+       warn: false
     become: true
 
 

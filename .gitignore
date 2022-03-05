@@ -12,8 +12,8 @@ netparams.py
 .ttn-lw-cli.yml
 *.spec
 *.obj
-windist.txt
-dodistwin.txt
+windist.output
+dodistwin.output
 dodist.sh
 dodist.bat
 makedist.sh

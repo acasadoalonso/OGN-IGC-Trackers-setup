@@ -64,7 +64,7 @@ dist/esp32-ogn-tracker-bin.tgz:	$(TRACKERSRC)/build/esp32-ogn-tracker.elf
 clean:		cleanlocal cleanfai
 
 cleanlocal:
-		rm -rf dist/TRKsetup* dist/VALI-AVX.Linux* dist/VALI-AVX.WIN* dist/VALI-AVX dist/TRKtools* dist/vali* *.spec build/ dist/build/ dist/*.tgz dist/*template dist/README.md
+		rm -rf *.output dist/TRKsetup* dist/VALI-AVX.Linux* dist/VALI-AVX.WIN* dist/VALI-AVX dist/TRKtools* dist/vali* *.spec build/ dist/build/ dist/*.tgz dist/*template dist/README.md
 cleanfai:
 		ansible-playbook distclean.yml
 
