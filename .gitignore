@@ -5,6 +5,8 @@ keypriv.PEM
 Keysfuncs.py
 genkeys.py
 TRKSconfig.ini
+dodist.sh
+makedist.sh
 ss*
 testTTN.py
 .vscode
@@ -12,14 +14,9 @@ netparams.py
 .ttn-lw-cli.yml
 *.spec
 *.obj
-windist.output
-dodistwin.output
-dodist.sh
-dodist.bat
-makedist.sh
-dist.yml
-win.bat
-win.yml
+*.output
+*.bat
+*.yml
 __pycache__/
 ECDSAtest/
 .vs/
