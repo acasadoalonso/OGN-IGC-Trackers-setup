@@ -39,7 +39,8 @@ dist/vali-avx.obj:  	vali-avx.cc *.h
 
 tarbal:		dist/TRKtools.tgz	
 
-dist/TRKtools.tgz: *.py *.cc *.h 		
+dist/TRKtools.tgz: *.py *.cc *.h dist/vali*
+		
 
 		cd $(SRC) && rm -rf build/*
 		rm *.spec 

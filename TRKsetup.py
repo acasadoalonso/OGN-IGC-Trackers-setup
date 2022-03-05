@@ -301,10 +301,14 @@ VT=b'\x0B'			# the Control K
 if encr:
    keyfilename=keyfile		# name of the file containing the encryption keys
    keyfileencrypted=keyfilename+'.encrypt'		# name of the file containing the keys encrypted
-   from Keysfuncs import *
+   print ("Encrypted file:", keyfileencrypted)		# 
+   if not os.path.exists(keyfileencrypted):		# check if we have that file ???
+      print ("The keyfile is NOT found !!! ...\n")
+      os._exit(-1) 
+   from Keysfuncs import *	# get the functions
    DecKey=[]			# the 4 hex values of the key
-   privkey = getprivatekey('keypriv.PEM')
-   key=getkeyfromencryptedfile(keyfileencrypted, privkey)
+   privkey = getprivatekey('keypriv.PEM')		# get the private key to decrypt the file either from file or memory
+   key=getkeyfromencryptedfile(keyfileencrypted, privkey) # decrypt the content of the file and get the encryption keys
    #print ("Key back from file:     ", key)
    #key=getkeyfile(keyfilename)	# get the key from the keyfile
    DecKey=getkeys(DecKey, key)	# get the keys 4 words
@@ -340,7 +344,7 @@ if usb == '-1':			# just a quick exit
 i=0
 if encr:			# if use encryption
 				# just prepare the encryption comd
-    encryptcmd=b'$POGNS,EncryptKey='# prepare the encryption keys
+    encryptcmd=b'$POGNS,Encrypt=1,EncryptKey='# prepare the encryption keys
     for k in DecKey:		# prepare the format
         kh=hex(k)
         h=kh[2:]
@@ -351,7 +355,7 @@ if encr:			# if use encryption
           encryptcmd += b'\n'
         i += 1
 else:
-    encryptcmd=b'$POGNS,Encrypt=0'# prepare the encryption keys
+    encryptcmd=b'$POGNS,Encrypt=0'# NO encryption
 
 
 # -------------------------------------#
@@ -362,7 +366,11 @@ ser.parity		= serial.PARITY_NONE
 ser.timeout		= 1
 ser.break_condition	= True
 
-ser.open()			# open the tracker console
+try:
+    ser.open()			# open the tracker console
+except:
+    print ("The TRACKER needs to be connected to the port: USB"+str(usb)+" ...  \n")
+    os._exit(-1)
 #--------------------------------------#
 
 ser.send_break(duration=0.25)	# send a break 
@@ -397,6 +405,7 @@ if not prt:
 if setup and encr:
 	ser.write(encryptcmd)	# Write the encryption keys
 	ser.write("$POGNS,Encrypt=1".encode('utf-8')) 
+	print("Encryption keys loaded !!!\n")
 if setup and not encr:		# erase the encrypted mode
 	ser.write("$POGNS,Encrypt=0".encode('utf-8')) 
 

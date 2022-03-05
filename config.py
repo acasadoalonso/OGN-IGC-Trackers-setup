@@ -24,7 +24,7 @@ if os.path.isfile(configfile):
 	cfg.read(configfile)		# reading it for the configuration file
 else:
 	print ("Config file: ", configfile, " not found \n")
-	exit(-1)
+	os._exit(-1)
 hostname = socket.gethostname()
 processid = str(os.getpid())
 
