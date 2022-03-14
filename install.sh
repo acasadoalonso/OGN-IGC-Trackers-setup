@@ -44,7 +44,7 @@ sudo apt-get install -y php-mcrypt
 sudo apt-get install -y php-mbstring php-gettext php-json	
 sudo apt-get install -y php7.3					
 sudo apt-get install -y ntpdate					
-sudo apt-get install -y minicom					
+sudo apt-get install -y minicom	 netcat				
 sudo apt-get install -y jq
 sudo apt-get install -y python3-mysqldb			
 sudo apt-get install -y libmbedtls-dev	

@@ -59,7 +59,17 @@ cp TRKSconfig.ini.template TRKSconfig.ini      and review the settings
 
 	# the name of the program is TRKsetup.xxxyyy where xxx is the opsys and yyy is the architecture of the server 
 
+or
+
+./TRKsetup.$(uname -s)$(uname -m) -h		# using the uname command 
+
 ./TRKsetup.Linuxarmv7l --setup  ON --reg ON    	# do the setup with registration on the FAI server
+
+./TRKsetup.Linuxarmv7l --setup  ON --encr ON   	# do the setup with ncryption ON 
+
+./TRKsetup.Linuxarmv7l --setup  ON --encr OFF  	# do the setup with ncryption OFF 
+
+./TRKsetup.Linuxarmv7l --setup  ON --encr ON --keyfile keyfile   # providing the keyfile sent by the IGC 
 
 
 =======================================================================================================

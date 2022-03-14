@@ -6,6 +6,7 @@ TTN_app_id     = ""
 TTN_dev_id     = ""
 TTN_appEui     = ""
 TTN_appKey     = ""
+TTN_app_key   = ""
 #
 
 #

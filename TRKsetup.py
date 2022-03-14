@@ -208,18 +208,18 @@ if os.name != 'nt':			# just report the version, not valid on NT or bundles from
       print("=========================================")
 # -------------------------------------------------------------------------------------------------------- #
 parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
-parser.add_argument('-p', '--print',       required=False, dest='prttxt',   action='store', default='False', help=' set print ON|OFF')
-parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0,       help='The USB port where the tracker is connected')
-parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False,   help='Do the setup of the tracker')
-parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile',help='Name of the file containing the keys')
-parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True,    help='Use the OGN DDB for the setup')
-parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False,   help='Setup for the TTN')
-parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False,   help='Setup for Helium')
-parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False,   help='Set the encryption ON|OFF')
-parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False,   help='Register this tracker on the FAI registration site')
-parser.add_argument('-a', '--pairing',     required=False, dest='pairing',  action='store', default='False', help='Pair this tracker with this Flarm')
-parser.add_argument('-w', '--owner',       required=False, dest='owner',    action='store', default='False', help='Name of the owner(optional)')
-parser.add_argument('-st','--stealth',     required=False, dest='stealth',  action='store', default='False', help='Stealth mode, non identified')
+parser.add_argument('-p', '--print',       required=False, dest='prttxt',   action='store', default='False',  help='Set print ON|OFF')
+parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0,        help='The USB port where the tracker is connected')
+parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False,    help='Do the setup on the tracker')
+parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile',help='Name of the file containing the keys, privided by the IGC')
+parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True,     help='Use the OGN DDB for the setup')
+parser.add_argument('-t', '--ttn',         required=False, dest='ttn',      action='store', default=False,    help='Setup for the TTN')
+parser.add_argument('-m', '--helium',      required=False, dest='helium',   action='store', default=False,    help='Setup for Helium')
+parser.add_argument('-n', '--encrypt',     required=False, dest='encr',     action='store', default=False,    help='Set the encryption ON|OFF')
+parser.add_argument('-r', '--register',    required=False, dest='reg',      action='store', default=False,    help='Register this tracker on the FAI registration site')
+parser.add_argument('-a', '--pairing',     required=False, dest='pairing',  action='store', default='False',  help='Pair this tracker with this Flarm')
+parser.add_argument('-w', '--owner',       required=False, dest='owner',    action='store', default='False',  help='Name of the owner(optional)')
+parser.add_argument('-st','--stealth',     required=False, dest='stealth',  action='store', default='False',  help='Stealth mode, non identified')
 
 args  	= parser.parse_args()
 prttxt 	= args.prttxt		# print debugging
@@ -471,13 +471,13 @@ if found:			# set the last one !!!
       print ("TheThingsNetwork (TTN) network activity...")
 
       net.TTN_dev_id      = flarmid.lower()
-      net.TTN_dev_Eui     = "0000"+MAC
+      net.TTN_dev_Eui     = MAC
       try:
          # add now the TTN V3 
-         clicmd = "ttn-lw-cli end-devices delete ogn "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_appEui+" " 
+         clicmd = "ttn-lw-cli end-devices delete ogn "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_joinEui+" " 
          print (clicmd)
          os.system(clicmd)
-         clicmd = "ttn-lw-cli end-devices create ogn "+net.TTN_dev_id+" --name "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_appEui+" --description OGN/IGC-"+regist+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a" 
+         clicmd = "ttn-lw-cli end-devices create ogn "+net.TTN_dev_id+" --name "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_appEui+" --description OGN/IGC-"+regist+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a --root-keys.app-key.key "+net.TTN_app_key
          print (clicmd)
          os.system(clicmd)
       except Exception as e:
@@ -489,7 +489,7 @@ if found:			# set the last one !!!
    if helopt and not ttnopt:			# if Helium registration
       print ("Helium network activity...")
       net.HEL_dev_id       = flarmid.lower()
-      net.HEL_dev_eui      = "0000"+MAC
+      net.HEL_dev_eui      = MAC
       net.HEL_name         = "OGN/IGC Tracker "+net.HEL_dev_id+" "+regist 
       net.HEL_DEVID        = getHEL_DEVID(net.HEL_dev_eui)			# get the Hellium ID for the list of devices
       if net.HEL_DEVID != 0:	# just report that exists
