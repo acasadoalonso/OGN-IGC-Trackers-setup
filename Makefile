@@ -43,12 +43,16 @@ dist/TRKtools.tgz: *.py *.cc *.h dist/vali*
 		
 
 		cd $(SRC) && rm -rf build/*
-		rm *.spec 
+		rm -f *.spec 
+		rm -f dist/TRK*.tgz
+		rm -f dist/TRK*.zip
 		@echo "==============================================================="
-		@echo ">>>         create the tarball TRKTOOLS.tgz <<<                "
+		@echo ">>>         create the tarball TRKTOOLS.tgz/.zip <<<           "
 		@echo "==============================================================="
-		tar cvzf TRKtools.tgz --exclude='*tgz' dist/*
+		tar cvzf TRKtools.tgz --exclude='*.tgz' --exclude="*.zip" dist/*
 		mv       TRKtools.tgz dist
+		zip TRKtools.zip dist/*WIN*
+		mv       TRKtools.zip dist
 		@echo "==================== tarbal done =============================="
 
 firmware:	dist/esp32-ogn-tracker-bin.tgz
@@ -64,7 +68,7 @@ dist/esp32-ogn-tracker-bin.tgz:	$(TRACKERSRC)/build/esp32-ogn-tracker.elf
 clean:		cleanlocal cleanfai
 
 cleanlocal:
-		rm -rf *.output dist/TRKsetup* dist/VALI-AVX.Linux* dist/VALI-AVX.WIN* dist/VALI-AVX dist/TRKtools* dist/vali* *.spec build/ dist/build/ dist/*.tgz dist/*template dist/README.md
+		rm -rf *.output dist/TRKsetup* dist/VALI-AVX.Linux* dist/VALI-AVX.WIN* dist/VALI-AVX dist/TRKtools* dist/vali* *.spec build/ dist/build/ dist/*.tgz dist/*.zip dist/*template dist/README.md
 cleanfai:
 		ansible-playbook distclean.yml
 
