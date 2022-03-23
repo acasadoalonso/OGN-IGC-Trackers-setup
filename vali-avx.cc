@@ -332,7 +332,8 @@ int main(int argc, char *argv[])				// the argument is the File Name
   char * response, *Message, *Temp, *buf;			// the response from the RegDB
   if (argc <= 1)
      {
-     printf("An IGC file name is needed !!!! ...\n\n");
+     printf("An IGC file name is needed !!!! ...\n");
+     printf("===================================\n\n");
      exit(-1);
      }
   char* filename = argv[1];					// name of the file

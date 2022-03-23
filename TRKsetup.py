@@ -32,12 +32,12 @@ def getdevappkey(app_client, dev_id):		# get the TTN app key from device id
     return (APP_key)
 
 ########
-def getHEL_DEVID(dev_eui):				# return the Helium ID based on the lorawan EUI
+def getHEL_DEVID(dev_eui):			# return the Helium ID based on the lorawan EUI
     r = requests.get(net.HEL_URL, headers=net.HEL_header)         	# get the list of devices
-    devices=r.json()					# read the data
+    devices=r.json()				# read the data
     for dev in devices:
-        if dev['dev_eui'] == dev_eui:			# it is our dev-eui ??
-           return (dev['id'])				# return tghe Helium ID
+        if dev['dev_eui'] == dev_eui:		# it is our dev-eui ??
+           return (dev['id'])			# return tghe Helium ID
     return 0
 
 ########
@@ -67,50 +67,50 @@ def gettrkpublickey(ser, prt=False):		# Get the public key from the trackera
     return publickey
 ########
 def printparams(ser, trkcfg, prt=False):	# print the parameters 
-				# ser serial, trkcfg the tracker configuration table possible values
-    ID=""			# tracker ID
-    MAC=""			# tracker MAC ID
+					# ser serial, trkcfg the tracker configuration table possible values
+    ID=""				# tracker ID
+    MAC=""				# tracker MAC ID
     cnt=0
     eol=False
-    param={}			# params decoded
-    etx=b'\x03'			# the Control C
-    while cnt < 256:		# at least 256 lines !!!
-        line = ser.readline()   # read a '\n' terminated line
+    param={}				# params decoded
+    etx=b'\x03'				# the Control C
+    while cnt < 256:			# at least 256 lines !!!
+        line = ser.readline()   	# read a '\n' terminated line
         #print ("LLL:", cnt, line)
-        if len(line) == 0:      # end of data ???
+        if len(line) == 0:      	# end of data ???
            if eol:
-              break		# all done
+              break			# all done
            else:
               eol=True
               continue
         l=line.decode('utf-8').rstrip()
         if line	[0:3] == 'I (':
            continue
-        if cnt == 0:		# first line is the ID
+        if cnt == 0:			# first line is the ID
            ID=line[0:10]
            if ID[0:4] != b'1:3:' and ID[0:4] != b'1:0:': 	# either normal or stealth
               print("ID>>>:", ID, "<<<")
-              ser.write(etx)	# send a Ctrl-C 
+              ser.write(etx)		# send a Ctrl-C 
               continue
            if line[10:11] == b'/':
               MAC=line[11:27]
-        if l[0:7] == '/spiffs':	# ignore the spiffs lines
+        if l[0:7] == '/spiffs':		# ignore the spiffs lines
            continue
         if prt:
-        	print (l)	# print the data received
-        cnt += 1		# increase the counter
-        sv=l.find(" = ")	# look for the = sign
-        if sv == -1:		# if not found ignore the line
+        	print (l)		# print the data received
+        cnt += 1			# increase the counter
+        sv=l.find(" = ")		# look for the = sign
+        if sv == -1:			# if not found ignore the line
            continue
-        for par in trkcfg:	# scan for config parameters
-            s  = l.find(' ')	# look for te first space
-            p  = l[0:s]		# get only the first token
-            sc = l.find(';')	# look for the end of the value
-            v  = l[sv+3:sc]	# get the value
-            if par == p :	# it is our param ?
+        for par in trkcfg:		# scan for config parameters
+            s  = l.find(' ')		# look for te first space
+            p  = l[0:s]			# get only the first token
+            sc = l.find(';')		# look for the end of the value
+            v  = l[sv+3:sc]		# get the value
+            if par == p :		# it is our param ?
                if v[0:2] == '0x':
                   v=int(v, 16)
-               param[par]=v	# yes, save the value 
+               param[par]=v		# yes, save the value 
                break
     if ID == '':
        print ("ID:", ID, "Please check if the tracker is ON !!!") 
@@ -122,10 +122,10 @@ def printparams(ser, trkcfg, prt=False):	# print the parameters
     if prt:
     	print ("Tracker ID:", trackerID, "MAC:", MAC)
     	print ("Parameters:\n", param, "\n")
-    return(param)		# return the table with the parameters already parsed
+    return(param)			# return the table with the parameters already parsed
 
 #######
-trkcfg=[ "Address", 		# config parameters to scan
+trkcfg=[ "Address", 			# config parameters to scan
          "AddrType",
          "AcftType",
          "Stealth",
@@ -244,12 +244,12 @@ if ognddb == "False":		# use the OGN DDB to get t5yyhe data
 else:
    ognddb = True			
 
-if ttnopt == "True":		# register at the TTN network
+if ttnopt == "True" or ttnopt == "ON":		# register at the TTN network
    ttnopt = True
 else:
    ttnopt = False			
 
-if helopt == "True":		# register at the helium network
+if helopt == "True" or helopt == "ON":		# register at the helium network
    helopt = True
 else:
    helopt = False			
@@ -394,10 +394,16 @@ if param == False:		# if not found, nothing else to do
    os._exit(1)
 #--------------------------------------#
 
-ID=param['TrackerID']		# get the tracker ID
-MAC=param['MAC']		# get the tracker MAC ID
+ID	=param['TrackerID']	# get the tracker ID
+MAC	=param['MAC']		# get the tracker MAC ID
+
 ser.write(VT)			# send a Ctrl-K 
 publickey=gettrkpublickey(ser)	# get the public key
+
+if param['Stealth'] == 1:
+   stealthset=True
+else:
+   stealthset=False
 
 if not prt:
    print("\n\nTracker ID=", ID, "MAC", MAC, "\n\n")# tracker ID
@@ -415,7 +421,14 @@ sleep(2)			# wait a second to give a chance to receive the data
 
 found=False			# assume not found YET
 
-if ognddb:			# if using the OGN DDB
+flarmid = MAC[-6:]
+devtype = "3"			# device type (glider, powerplane, paraglider, etc, ...)
+regist 	= "NOREG" 		# registration id to be linked
+pilot 	= 'OGN/IGC_Tracker'  	# owner
+compid 	= "NO" 			# competition ID
+model  	= "UNK"			# model
+uniqueid= "0"			# unique id
+if ognddb and not stealthset:	# if using the OGN DDB
    devid=ID
    info=getogninfo(devid)	# get the info from the OGN DDB
    if 'return' in info or info == "NOInfo":
@@ -438,7 +451,7 @@ if ognddb:			# if using the OGN DDB
         if not prt:
            print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model, uniqueid) 
         found=True
-else:				# deprecated code (used for testing and debugging)
+elif not stealthset:				# deprecated code (used for testing and debugging)
 
    curs = conn.cursor()         # set the cursor for searching the devices
                                 # get all the devices with OGN tracker
@@ -464,7 +477,7 @@ else:				# deprecated code (used for testing and debugging)
 
 print( "==============================================================================================\n\n")
 
-if found:			# set the last one !!!
+if setup or pairing  or stealthset or stealth :		# set the last one !!!
 
    APP_key=net.TTN_App_Key	# for the $POGNS cmd
    if ttnopt and not helopt:	# if TTN registration
@@ -569,6 +582,7 @@ if found:			# set the last one !!!
 
    if setup:								# if setup is required 
 									# use the $POGNS cmd to set the parameters ...
+        print("Doing the SETUP of the OGN/IGC Tracker ....\n")
         cmd="$POGNS,Reg="+regist+"\n"					# Registration ID
         ser.write(cmd.encode('UTF-8'))
         cmd="$POGNS,Pilot="+pilot+"\n"					# pilot name
@@ -597,35 +611,42 @@ if found:			# set the last one !!!
            ser.write(cmd.encode('UTF-8'))
            cmd="$POGNS,Stealth=1\n"
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,Reg=\n"						# and erase all the data that could identify the tracker
+           cmd="$POGNS,Reg=0;\n"						# and erase all the data that could identify the tracker
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,Pilot=\n"
+           cmd="$POGNS,Pilot=0;\n"
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,ID=\n"
+           cmd="$POGNS,ID=0;\n"
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,Model=\n"
+           cmd="$POGNS,Model=0;\n"
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,SN=\n"
+           cmd="$POGNS,SN=0;\n"
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,PilotID=\n"					# 
+           cmd="$POGNS,PilotID=0;\n"					# 
            ser.write(cmd.encode('UTF-8'))
-        else:
+           cmd="$POGNS,Base=0;\n"					# 
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,Class=0;\n"					# 
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,Manuf=0;\n"					# 
+           ser.write(cmd.encode('UTF-8'))
+        elif stealthset:						# if stealth was ON
            cmd="$POGNS,AddrType=3\n"					# back to be a std tracker
            ser.write(cmd.encode('UTF-8'))
            cmd="$POGNS,Stealth=0\n"					# no stealth 
+           ser.write(cmd.encode('UTF-8'))
+           cmd="$POGNS,Address=0x"+MAC[-6:]+"\n"			# back to the original addr
            ser.write(cmd.encode('UTF-8'))
         ser.write(etx)							# send a Ctrl-C 
         sleep(1)							# wait a second to give a chance to receive the data
         printparams(ser, trkcfg, False) 				# print the new parameters
 
-   if regopt:								# if registration on the registration DB
+   if regopt and found:								# if registration on the registration DB
         #print("PPP", MAC, regist, ID, uniqueid, publickey)
         r=setregdata(MAC, regist, ID, uniqueid, publickey)
         print ("Registration at server: ", r)
 
-else:
+elif not found:
    print("No information about the device "+ID+" on the OGN databases !!!\n\n")
 print( "==============================================================================================")
 ser.close()
 os._exit(0)
-###################################################################################################################################################################

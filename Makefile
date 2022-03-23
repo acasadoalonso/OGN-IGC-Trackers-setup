@@ -8,7 +8,7 @@ all: TRKsetup VALI-AVX vali-avx dist/vali-avx.obj
 
 TRKsetup:	dist/TRKsetup.$(UNAME_S)$(UNAME_M)
 
-dist/TRKsetup.$(UNAME_S)$(UNAME_M): 	TRKsetup.py
+dist/TRKsetup.$(UNAME_S)$(UNAME_M): 	TRKsetup.py config.py netparams.py
 
 		cd $(SRC)      && rm -rf build/*
 		cd $(SRC)/dist && rm -rf build/*
@@ -20,7 +20,7 @@ dist/TRKsetup.$(UNAME_S)$(UNAME_M): 	TRKsetup.py
 
 VALI-AVX: 	dist/VALI-AVX.$(UNAME_S)$(UNAME_M) 
 
-dist/VALI-AVX.$(UNAME_S)$(UNAME_M): 	VALI-AVX.py 
+dist/VALI-AVX.$(UNAME_S)$(UNAME_M): 	VALI-AVX.py config.py netparams.py
 		cd $(SRC)      && rm -rf build/* 
 		cd $(SRC)/dist && rm -rf build/* 
 		@echo " "
@@ -37,7 +37,7 @@ dist/vali-avx.obj:  	vali-avx.cc *.h
 		x86_64-w64-mingw32-g++-win32 -Wall -Wno-misleading-indentation -O2 -Imbedtls/include -lmbedtls/visualc/VS2010/x64/Release/mbedTLS.lib -static -c -o dist/vali-avx.obj vali-avx.cc 
 		touch dist/vali-avx.obj
 
-tarbal:		dist/TRKtools.tgz	
+tarbal:		dist/TRKtools.tgz	docs/OGN-Tracking-WGC.pdf
 
 dist/TRKtools.tgz: *.py *.cc *.h dist/vali*
 		
@@ -49,9 +49,9 @@ dist/TRKtools.tgz: *.py *.cc *.h dist/vali*
 		@echo "==============================================================="
 		@echo ">>>         create the tarball TRKTOOLS.tgz/.zip <<<           "
 		@echo "==============================================================="
-		tar cvzf TRKtools.tgz --exclude='*.tgz' --exclude="*.zip" dist/*
+		tar cvzf TRKtools.tgz --exclude='*.tgz' --exclude="*.zip" dist/* docs/OGN-Tracking-WGC.pdf
 		mv       TRKtools.tgz dist
-		zip TRKtools.zip dist/*WIN*
+		zip TRKtools.zip dist/*WIN* docs/OGN-Tracking-WGC.pdf
 		mv       TRKtools.zip dist
 		@echo "==================== tarbal done =============================="
 

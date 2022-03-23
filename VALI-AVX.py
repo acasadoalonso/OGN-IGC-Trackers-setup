@@ -193,7 +193,7 @@ parser = argparse.ArgumentParser(description="VALI-AVX validate the signature of
 parser.add_argument('-p',  '--print',     required=False, dest='prttxt',   action='store', default=False, help='Print ON|OFF')
 parser.add_argument('-s',  '--strongval', required=False, dest='strongvaltxt',   action='store', default=False, help='In case of needed strong validation')
 parser.add_argument('-u', '--usb',        required=False, dest='usb',      action='store', default=0, help='With strong validation the USB port where the tracker is connected')
-parser.add_argument( dest='filename',   action='store', default='NOFILENAME')
+parser.add_argument( dest='filename',     action='store',  default='NOFILENAME')
 args = parser.parse_args()
 prttxt     = args.prttxt                # print on|off
 if prttxt == 'True':

@@ -12,12 +12,16 @@ from configparser import ConfigParser
 configdir = os.getenv('CONFIGDIR')
 
 if configdir == None and os.name != 'nt':
-    configdir = '/etc/local/'
-configfile = configdir+'TRKSconfig.ini'
-if os.path.isfile("./TRKSconfig.ini"):
-    configfile =  './TRKSconfig.ini'
+     configdir = '/etc/local/'		# the default directory
+elif configdir == None :
+     configdir = './'			# the current directory for WIN
+
+configfile = configdir+'TRKSconfig.ini'	# the configuration file
+
+if os.path.isfile("./TRKSconfig.ini"):	# check if exists
+    configfile =  './TRKSconfig.ini'	# try the current directory
+
 if os.path.isfile(configfile):
-	
 	# get the configuration parameters
 	cfg=ConfigParser()		# get the configuration parameters
 	# reading it for the configuration file
@@ -25,8 +29,9 @@ if os.path.isfile(configfile):
 else:
 	print ("Config file: ", configfile, " not found \n")
 	os._exit(-1)
-hostname = socket.gethostname()
-processid = str(os.getpid())
+
+hostname = socket.gethostname()		# get the hostsname
+processid = str(os.getpid())		# and the process ID
 
 
 MySQLtext = cfg.get('server', 'MySQL').strip("'").strip('"')
@@ -88,12 +93,12 @@ except:
 # report the configuration paramenters
 LogData = False
 if 'USER' in os.environ and prt:
-
    print("Hostname:            ", hostname, " and config file: ", configfile, "process ID:",processid)
    if MySQL:
-      print("Config server values:",                  "MySQL =", MySQL, DBhost, DBuser, DBname, DBpath)
+      print("Config server values:", "MySQL =", MySQL, DBhost, DBuser, DBname, DBpath)
 # --------------------------------------#
 APP = 'TRKSETUP'					# alternate TRK SETUP
-SOCK = 0
+SOCK = 0						# global vars
 SOCK_FILE = 0
 RegWarning = True
+# --------------------------------------#
