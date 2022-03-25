@@ -209,7 +209,7 @@ if os.name != 'nt':			# just report the version, not valid on NT or bundles from
 # -------------------------------------------------------------------------------------------------------- #
 parser = argparse.ArgumentParser(description="Manage the OGN TRACKERS setup parameters")
 parser.add_argument('-p', '--print',       required=False, dest='prttxt',   action='store', default='False',  help='Set print ON|OFF')
-parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default=0,        help='The USB port where the tracker is connected')
+parser.add_argument('-u', '--usb',         required=False, dest='usb',      action='store', default='USB0',   help='The USB port where the tracker is connected')
 parser.add_argument('-s', '--setup',       required=False, dest='setup',    action='store', default=False,    help='Do the setup on the tracker')
 parser.add_argument('-kf','--keyfile',     required=False, dest='keyfile',  action='store', default='keyfile',help='Name of the file containing the keys, privided by the IGC')
 parser.add_argument('-o', '--ognddb',      required=False, dest='ognddb',   action='store', default=True,     help='Use the OGN DDB for the setup')
@@ -360,7 +360,7 @@ else:
 
 # -------------------------------------#
 ser 			= serial.Serial()
-ser.port 		= '/dev/ttyUSB'+str(usb)
+ser.port 		= '/dev/tty'+usb
 ser.baudrate 		= 115200
 ser.parity		= serial.PARITY_NONE
 ser.timeout		= 1
@@ -369,7 +369,7 @@ ser.break_condition	= True
 try:
     ser.open()			# open the tracker console
 except:
-    print ("The TRACKER needs to be connected to the port: USB"+str(usb)+" ...  \n")
+    print ("The TRACKER needs to be connected to the port: /dev/tty"+usb+" ...  \n")
     os._exit(-1)
 #--------------------------------------#
 
@@ -422,7 +422,7 @@ sleep(2)			# wait a second to give a chance to receive the data
 found=False			# assume not found YET
 
 flarmid = MAC[-6:]
-devtype = "3"			# device type (glider, powerplane, paraglider, etc, ...)
+devtype = 1			# device type (glider, powerplane, paraglider, etc, ...)
 regist 	= "NOREG" 		# registration id to be linked
 pilot 	= 'OGN/IGC_Tracker'  	# owner
 compid 	= "NO" 			# competition ID
@@ -487,10 +487,10 @@ if setup or pairing  or stealthset or stealth :		# set the last one !!!
       net.TTN_dev_Eui     = MAC
       try:
          # add now the TTN V3 
-         clicmd = "ttn-lw-cli end-devices delete ogn "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_joinEui+" " 
+         clicmd = "ttn-lw-cli end-devices delete ogn ogn"+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_joinEui+" " 
          print (clicmd)
          os.system(clicmd)
-         clicmd = "ttn-lw-cli end-devices create ogn "+net.TTN_dev_id+" --name "+net.TTN_dev_id+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_appEui+" --description OGN/IGC-"+regist+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a --root-keys.app-key.key "+net.TTN_app_key
+         clicmd = "ttn-lw-cli end-devices create ogn ogn"+net.TTN_dev_id+" --name OGN"+net.TTN_dev_id.upper()+" -c .ttn-lw-cli.yml --dev-eui "+net.TTN_dev_Eui+" --join-eui "+net.TTN_appEui+" --description OGN/IGC-"+regist+" --frequency-plan-id EU_863_870 --lorawan-version 1.0.3 --lorawan-phy-version 1.0.3-a --root-keys.app-key.key "+net.TTN_app_key
          print (clicmd)
          os.system(clicmd)
       except Exception as e:
@@ -603,15 +603,19 @@ if setup or pairing  or stealthset or stealth :		# set the last one !!!
         ser.write(cmd.encode('UTF-8'))
         cmd="$POGNS,Soft="+Soft+"\n"					# Hardware version 
         ser.write(cmd.encode('UTF-8'))
+        cmd="$POGNS,PageMask=0x08FF\n"					# Page Mask --> All the pages ...
+        ser.write(cmd.encode('UTF-8'))
+
         if APP_key != '':						# if we have an APP key ??
            cmd="$POGNS,AppKey="+APP_key+"\n"
            ser.write(cmd.encode('UTF-8'))
+
         if stealth:							# if stealth mode requested
            cmd="$POGNS,AddrType=0\n"
            ser.write(cmd.encode('UTF-8'))
            cmd="$POGNS,Stealth=1\n"
            ser.write(cmd.encode('UTF-8'))
-           cmd="$POGNS,Reg=0;\n"						# and erase all the data that could identify the tracker
+           cmd="$POGNS,Reg=0;\n"					# and erase all the data that could identify the tracker
            ser.write(cmd.encode('UTF-8'))
            cmd="$POGNS,Pilot=0;\n"
            ser.write(cmd.encode('UTF-8'))
@@ -646,7 +650,7 @@ if setup or pairing  or stealthset or stealth :		# set the last one !!!
         print ("Registration at server: ", r)
 
 elif not found:
-   print("No information about the device "+ID+" on the OGN databases !!!\n\n")
+   print("WARNING: No information about the device "+ID+" on the OGN databases !!!\n\n")
 print( "==============================================================================================")
 ser.close()
 os._exit(0)
