@@ -80,7 +80,7 @@ The main utility is the trksetup.py:
 
 Invokation:   python3  TRKsetup -h      or     ./TRKsetup.py -h   # for the PYTHON version
 
-             ./TRKsetup.xxxyyy			# where xxx is the opsys and yyy is the architecture ARM32/ARM64/AMD64/WIN
+             ./TRKset15up.xxxyyy			# where xxx is the opsys and yyy is the architecture ARM32/ARM64/AMD64/WIN
              
 
 It gets the information from the tracker firmware and handles the setup parameter.

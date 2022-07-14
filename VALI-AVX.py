@@ -34,7 +34,7 @@ from mbedtls._ringbuf      import *
 secret='c7675a2e6297b8e4990c0a29118914c0d4ee17ec'
 
 #DDB_URL = "http://ddb.glidernet.org/download/?j=1"
-DDB_URL = "http://acasado.es:60082/download/?j=2"  				# the OGN DDB source
+DDB_URL = "http://ddb.acasado.name:60082/download/?j=2"  				# the OGN DDB source
 REG_URL = "http://glidertracking.fai.org:80/registration/V1/?action=getdata&token="  	# the OGN registration source
 #REG_URL = "http://localhost:8181/?action=getdata&token="  			# the OGN registration source
 

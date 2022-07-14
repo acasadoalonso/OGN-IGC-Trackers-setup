@@ -41,7 +41,7 @@ def getHEL_DEVID(dev_eui):			# return the Helium ID based on the lorawan EUI
     return 0
 
 ########
-def gettrkpublickey(ser, prt=False):		# Get the public key from the trackera
+def gettrkpublickey(ser, prt=False):		# Get the public key from the tracker
     publickey=""				# public key from tracker
     cnt=0
     eol=False
@@ -254,7 +254,7 @@ if helopt == "True" or helopt == "ON":		# register at the helium network
 else:
    helopt = False			
 
-if regopt == "True" or regopt == 'ON':		# register the device
+if regopt == "True" or regopt == 'ON':		# register the device on the FAI server
    regopt = True
    ognddb = True		# register froce to use the OGN DDB			
 else:
@@ -290,12 +290,13 @@ else:
    print("Pairing on MySQL: Database:", DBname, " at Host:", DBhost)
    
 
-if owner == "False":		# use the OGN DDB to get t5yyhe data
+if owner == "False":		# use the OGN DDB to get the data
    owner = False
 
 
 etx=b'\x03'			# the Control C
 VT=b'\x0B'			# the Control K
+
 # -------------------------------------------------------------------------------#
 				# deal with the encryption set the DecKey array
 if encr:
@@ -380,7 +381,7 @@ ser.write(etx)			# send a Ctrl-C
 sleep(2)			# wait a second to give a chance to receive the data
 #--------------------------------------#
 
-try:
+try:				# receive the parameters
    param=printparams(ser, trkcfg, prt)
 				# get the configuration parameters
 except:				# just in case try again !!!
@@ -397,8 +398,9 @@ if param == False:		# if not found, nothing else to do
 ID	=param['TrackerID']	# get the tracker ID
 MAC	=param['MAC']		# get the tracker MAC ID
 
-ser.write(VT)			# send a Ctrl-K 
-publickey=gettrkpublickey(ser)	# get the public key
+if regopt:			# if we need to register the tracker 
+   ser.write(VT)		# send a Ctrl-K 
+   publickey=gettrkpublickey(ser) # get the public key
 
 if param['Stealth'] == 1:
    stealthset=True
@@ -427,7 +429,8 @@ regist 	= "NOREG" 		# registration id to be linked
 pilot 	= 'OGN/IGC_Tracker'  	# owner
 compid 	= "NO" 			# competition ID
 model  	= "UNK"			# model
-uniqueid= "0"			# unique id
+uniqueid= "0"			# unique ida
+
 if ognddb and not stealthset:	# if using the OGN DDB
    devid=ID
    info=getogninfo(devid)	# get the info from the OGN DDB
@@ -446,12 +449,13 @@ if ognddb and not stealthset:	# if using the OGN DDB
         regist 	= info['registration'] 	# registration id to be linked
         pilot 	= 'OGN/IGC_Tracker'  	# owner
         compid 	= info['cn']  		# competition ID
-        model  	= info['aircraft_model']  	# model
+        model  	= info['aircraft_model'] # model
         uniqueid= info['uniqueid']	# unique id
         if not prt:
            print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model, uniqueid) 
         found=True
-elif not stealthset:				# deprecated code (used for testing and debugging)
+
+elif not stealthset:		# deprecated code (used for testing and debugging)
 
    curs = conn.cursor()         # set the cursor for searching the devices
                                 # get all the devices with OGN tracker
@@ -603,7 +607,7 @@ if setup or pairing  or stealthset or stealth :		# set the last one !!!
         ser.write(cmd.encode('UTF-8'))
         cmd="$POGNS,Soft="+Soft+"\n"					# Hardware version 
         ser.write(cmd.encode('UTF-8'))
-        cmd="$POGNS,PageMask=0x08FF\n"					# Page Mask --> All the pages ...
+        cmd="$POGNS,PageMask=0x08FF\n"					# Page Mask --> All basic he pages ...
         ser.write(cmd.encode('UTF-8'))
 
         if APP_key != '':						# if we have an APP key ??
@@ -644,13 +648,13 @@ if setup or pairing  or stealthset or stealth :		# set the last one !!!
         sleep(1)							# wait a second to give a chance to receive the data
         printparams(ser, trkcfg, False) 				# print the new parameters
 
-   if regopt and found:								# if registration on the registration DB
+   if regopt and found:							# if registration on the registration DB
         #print("PPP", MAC, regist, ID, uniqueid, publickey)
         r=setregdata(MAC, regist, ID, uniqueid, publickey)
         print ("Registration at server: ", r)
 
 elif not found:
    print("WARNING: No information about the device "+ID+" on the OGN databases !!!\n\n")
-print( "==============================================================================================")
+print( "==============================================================================================\n")
 ser.close()
 os._exit(0)
