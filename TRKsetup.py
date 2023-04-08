@@ -450,7 +450,8 @@ if ognddb and not stealthset:	# if using the OGN DDB
         pilot 	= 'OGN/IGC_Tracker'  	# owner
         compid 	= info['cn']  		# competition ID
         model  	= info['aircraft_model'] # model
-        uniqueid= info['uniqueid']	# unique id
+        if 'uniqueid' in info:
+            uniqueid= info['uniqueid']	# unique id
         if not prt:
            print ("From OGN DDB:", ogntid, devtype, flarmid, regist, pilot, compid, model, uniqueid) 
         found=True
