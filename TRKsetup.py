@@ -6,7 +6,6 @@ import argparse
 import serial
 from   time import sleep          # use the sleep function
 import time
-import ttn
 import json
 import datetime
 import signal
@@ -239,13 +238,14 @@ if prttxt == "True" or prttxt == 'TRUE' or prttxt == 'ON': # set print mode
    prt = True
 else:
    prt = False			# may be changed by the config profile
-if ognddb == "False":		# use the OGN DDB to get t5yyhe data
+if ognddb == "False" or ognddb == "False" :	# use the OGN DDB to get t5yyhe data
    ognddb = False
 else:
    ognddb = True			
 
 if ttnopt == "True" or ttnopt == "ON":		# register at the TTN network
    ttnopt = True
+   import ttn
 else:
    ttnopt = False			
 
@@ -260,20 +260,25 @@ if regopt == "True" or regopt == 'ON':		# register the device on the FAI server
 else:
    regopt = False			
 
-if encr == "True" or encr == 'ON':		# set encryption mode
+if encr == "True" or encr == "TRUE" or encr == 'ON':		# set encryption mode
    encr = True
 else:
    encr = False			
 
-if stealth == "True" or stealth == 'ON':	# set stealth mode
+if stealth == "True" or stealth == "TRUE" or stealth == 'ON':	# set stealth mode
    stealth = True
 else:
    stealth = False			
 
+if setup == "True" or setup == "TRUE" or setup == 'ON':	# set stealth mode
+   setup = True
+else:
+   setup = False			
+
 if ttnopt and helopt:
    print("ERROR: Both networks TTN & Helium can not be chosen at the same time !!!\n\n")
 
-if pairing == "False":		# use the OGN DDB to get the data
+if pairing == "False" or pairing == "FALSE":	# use the OGN DDB to get the data
    pairing = False
 else:
    import config		# get the configuration parameters

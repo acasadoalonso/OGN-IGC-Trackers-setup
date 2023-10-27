@@ -60,5 +60,5 @@ date                                                              >>trks.log 2>/
 
 date                            		>>trks.log
 mv trks.log archive/trks$(date +%y%m%d).log 
-mv trkserr.log archive/trkserr$(date +%y%m%d).log 
+mv trkserr.log archive/trkserr$(date +%y%m%d).log  2>/dev/null
 cd
