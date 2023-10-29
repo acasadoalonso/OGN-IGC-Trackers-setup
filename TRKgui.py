@@ -6,6 +6,11 @@ from tkinter import messagebox
 
 import os
 
+
+def on_closing():
+    if messagebox.askyesno(title="Quit IGC/OGN TRKsetup GUI ", message="Do you really want to quit ?"):
+       window.destroy()
+
 def enter_data():
 
     accepted = accept_var.get()
@@ -80,10 +85,10 @@ window = tk.Tk()
 window.geometry("1000x780")
 
 window.title("IGC/OGN Tracker setup")
-
+window.protocol("WM_DELETE_WINDOW", on_closing)
 menubar =tk.Menu(window)
 filemenu=tk.Menu(menubar, tearoff=0)
-filemenu.add_command(label="Close", command=exit)
+filemenu.add_command(label="Close", command=on_closing)
 menubar.add_cascade(menu=filemenu, label="File")
 window.config(menu=menubar)
 
