@@ -407,7 +407,7 @@ if regopt:			# if we need to register the tracker
    ser.write(VT)		# send a Ctrl-K 
    publickey=gettrkpublickey(ser) # get the public key
 
-if param['Stealth'] == 1:
+if 'Stealth' in param and param['Stealth'] == 1:
    stealthset=True
 else:
    stealthset=False

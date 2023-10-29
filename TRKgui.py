@@ -1,4 +1,4 @@
-import tkinter
+import tkinter as tk
 
 from tkinter import ttk
 
@@ -76,14 +76,18 @@ def enter_data():
 
 
 
-window = tkinter.Tk()
+window = tk.Tk()
 window.geometry("1000x780")
 
 window.title("IGC/OGN Tracker setup")
 
+menubar =tk.Menu(window)
+filemenu=tk.Menu(menubar, tearoff=0)
+filemenu.add_command(label="Close", command=exit)
+menubar.add_cascade(menu=filemenu, label="File")
+window.config(menu=menubar)
 
-
-frame = tkinter.Frame(window)
+frame = tk.Frame(window)
 
 frame.pack()
 
@@ -91,25 +95,25 @@ frame.pack()
 
 # dealing with USB & Keyfile
 
-user_info_frame =tkinter.LabelFrame(frame, text="User Information")
+user_info_frame =tk.LabelFrame(frame, text="User Information")
 
 user_info_frame.grid(row= 0, column=0, padx=20, pady=10)
 
 
 
-USB_label = tkinter.Label(user_info_frame, text="USB")
+USB_label = tk.Label(user_info_frame, text="USB")
 
 USB_label.grid(row=0, column=0)
 
-keyfile_label = tkinter.Label(user_info_frame, text="Keyfile")
+keyfile_label = tk.Label(user_info_frame, text="Keyfile")
 
 keyfile_label.grid(row=0, column=1)
 
 
 
-USB_entry = tkinter.Entry(user_info_frame)
+USB_entry = tk.Entry(user_info_frame)
 
-keyfile_entry = tkinter.Entry(user_info_frame)
+keyfile_entry = tk.Entry(user_info_frame)
 
 USB_entry.grid(row=1, column=0)
 
@@ -117,7 +121,7 @@ keyfile_entry.grid(row=1, column=1)
 
 
 
-prt_label = tkinter.Label(user_info_frame, text="prt")
+prt_label = tk.Label(user_info_frame, text="prt")
 
 prt_combobox = ttk.Combobox(user_info_frame, values=["", "Y", "N"])
 
@@ -138,12 +142,12 @@ for widget in user_info_frame.winfo_children():
 
 # dealing with the options
 
-options_frame = tkinter.LabelFrame(frame, text="SETUP Options")
+options_frame = tk.LabelFrame(frame, text="SETUP Options")
 
 options_frame.grid(row=1, column=0, sticky="news", padx=20, pady=10)
 
 
-setup_label = tkinter.Label(options_frame, text="setup")
+setup_label = tk.Label(options_frame, text="setup")
 
 setup_combobox = ttk.Combobox(options_frame, values=["", "Y", "N"])
 
@@ -152,7 +156,7 @@ setup_label.grid(row=0, column=0)
 setup_combobox.grid(row=1, column=0)
 
 
-ognddb_label = tkinter.Label(options_frame, text="OGNDDB")
+ognddb_label = tk.Label(options_frame, text="OGNDDB")
 
 ognddb_combobox = ttk.Combobox(options_frame, values=["", "Y", "N"])
 
@@ -161,7 +165,7 @@ ognddb_label.grid(row=0, column=1)
 ognddb_combobox.grid(row=1, column=1)
 
 
-encrypt_label = tkinter.Label(options_frame, text="Encrypt")
+encrypt_label = tk.Label(options_frame, text="Encrypt")
 
 encrypt_combobox = ttk.Combobox(options_frame, values=["", "Y", "N"])
 
@@ -170,7 +174,7 @@ encrypt_label.grid(row=0, column=2)
 encrypt_combobox.grid(row=1, column=2)
 
 
-stealth_label = tkinter.Label(options_frame, text="Stealth")
+stealth_label = tk.Label(options_frame, text="Stealth")
 
 stealth_combobox = ttk.Combobox(options_frame, values=["", "Y", "N"])
 
@@ -179,7 +183,7 @@ stealth_label.grid(row=2, column=0)
 stealth_combobox.grid(row=3, column=0)
 
 
-reg_label = tkinter.Label(options_frame, text="Register")
+reg_label = tk.Label(options_frame, text="Register")
 
 reg_combobox = ttk.Combobox(options_frame, values=["", "Y", "N"])
 
@@ -194,15 +198,15 @@ for widget in options_frame.winfo_children():
 
 # Accept terms
 
-terms_frame = tkinter.LabelFrame(frame, text="Terms & Conditions")
+terms_frame = tk.LabelFrame(frame, text="Terms & Conditions")
 
 terms_frame.grid(row=2, column=0, sticky="news", padx=20, pady=10)
 
 
 
-accept_var = tkinter.StringVar(value="Not Accepted")
+accept_var = tk.StringVar(value="Not Accepted")
 
-terms_check = tkinter.Checkbutton(terms_frame, text= "I have connected the IGC/OGN Tracker.",
+terms_check = tk.Checkbutton(terms_frame, text= "I have connected the IGC/OGN Tracker.",
 
                                   variable=accept_var, onvalue="Accepted", offvalue="Not Accepted")
 
@@ -212,7 +216,7 @@ terms_check.grid(row=0, column=0)
 
 # Button
 
-button = tkinter.Button(frame, text="Enter data", command= enter_data)
+button = tk.Button(frame, text="Enter data", command= enter_data)
 
 button.grid(row=3, column=0, sticky="news", padx=20, pady=10)
 
